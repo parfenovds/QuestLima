@@ -1,7 +1,7 @@
-package com.javarush.khmelov.lesson13.repository;
+package com.javarush.khmelov.lesson14.repository;
 
-import com.javarush.khmelov.lesson13.entity.Role;
-import com.javarush.khmelov.lesson13.entity.User;
+import com.javarush.khmelov.lesson14.entity.Role;
+import com.javarush.khmelov.lesson14.entity.User;
 
 import java.util.Collection;
 import java.util.HashMap;

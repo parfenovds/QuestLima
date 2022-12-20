@@ -1,8 +1,8 @@
-package com.javarush.khmelov.lesson13;
+package com.javarush.khmelov.lesson14;
 
-import com.javarush.khmelov.lesson13.entity.Role;
-import com.javarush.khmelov.lesson13.entity.User;
-import com.javarush.khmelov.lesson13.service.UserService;
+import com.javarush.khmelov.lesson14.entity.Role;
+import com.javarush.khmelov.lesson14.entity.User;
+import com.javarush.khmelov.lesson14.service.UserService;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
@@ -12,7 +12,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
