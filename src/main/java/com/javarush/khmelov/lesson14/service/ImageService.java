@@ -43,7 +43,7 @@ public enum ImageService {
                 .orElse(imagesFolder.resolve(NO_IMAGE_PNG));
     }
 
-    public void uploadImage(HttpServletRequest req, String id) throws IOException, ServletException {
+    public void uploadImage(HttpServletRequest req, long id) throws IOException, ServletException {
         Part data = req.getPart(PART_NAME);
         if (Objects.nonNull(data) && data.getInputStream().available() > 0) {
             String filename = data.getSubmittedFileName();
