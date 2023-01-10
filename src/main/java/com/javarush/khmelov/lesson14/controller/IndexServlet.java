@@ -1,4 +1,4 @@
-package com.javarush.khmelov.lesson14;
+package com.javarush.khmelov.lesson14.controller;
 
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;

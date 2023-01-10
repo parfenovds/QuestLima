@@ -1,4 +1,4 @@
-package com.javarush.khmelov.lesson14;
+package com.javarush.khmelov.lesson14.controller;
 
 import com.javarush.khmelov.lesson14.service.ImageService;
 import jakarta.servlet.annotation.WebServlet;

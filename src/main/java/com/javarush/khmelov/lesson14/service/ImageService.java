@@ -29,7 +29,7 @@ public enum ImageService {
     private final Path imagesFolder = Config.WEB_INF.resolve(IMAGES_FOLDER);
 
     @SneakyThrows
-    private ImageService() {
+    ImageService() {
         Files.createDirectories(imagesFolder);
     }
 
