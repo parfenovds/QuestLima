@@ -10,23 +10,23 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.Optional;
 
-@SuppressWarnings("serial")
-@WebServlet(name = "UsersServlet", value = Go.USERS)
-public class UsersServlet extends HttpServlet {
+@WebServlet(name = "ProfileServlet", value = Go.PROFILE)
+public class ProfileServlet extends HttpServlet {
 
     private final UserService userService = UserService.USER_SERVICE;
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        Collection<User> users = userService.getAll();
-        request.setAttribute(Key.USERS,users);
-        Jsp.forward(request, response, Key.USERS);
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Jsp.forward(request, response, Go.PROFILE);
     }
 
-
-    public void destroy() {
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        Jsp.redirect(response, Go.USER);
     }
 }

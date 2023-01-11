@@ -6,8 +6,8 @@ import com.javarush.khmelov.lesson14.entity.User;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Stream;
 
 public class UserRepository implements Repository<User> {
 
@@ -16,9 +16,9 @@ public class UserRepository implements Repository<User> {
     public static final AtomicLong id = new AtomicLong(System.currentTimeMillis());
 
     public UserRepository() {
-        map.put(1L, new User(1L,"user","qwerty", Role.USER));
-        map.put(2L, new User(2L,"guest","", Role.GUEST));
-        map.put(3L, new User(3L,"admin","admin", Role.ADMIN));
+        map.put(1L, new User(1L, "user", "qwerty", Role.USER));
+        map.put(2L, new User(2L, "guest", "guest", Role.GUEST));
+        map.put(3L, new User(3L, "admin", "admin", Role.ADMIN));
     }
 
     @Override
@@ -27,8 +27,22 @@ public class UserRepository implements Repository<User> {
     }
 
     @Override
-    public Optional<User> get(long id) {
-        return Optional.ofNullable(map.get(id));
+    public Stream<User> find(User pattern) {
+        return map.values()
+                .stream()
+                .filter(u -> nullOrEquals(pattern.getId(), u.getId()))
+                .filter(u -> nullOrEquals(pattern.getLogin(), u.getLogin()))
+                .filter(u -> nullOrEquals(pattern.getPassword(), u.getPassword()))
+                .filter(u -> nullOrEquals(pattern.getRole(), u.getRole()));
+    }
+
+    private boolean nullOrEquals(Object patternField, Object repoField) {
+        return patternField == null || patternField.equals(repoField);
+    }
+
+    @Override
+    public User get(long id) {
+        return map.get(id);
     }
 
     @Override
