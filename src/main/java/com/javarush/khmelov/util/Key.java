@@ -1,4 +1,4 @@
-package com.javarush.khmelov.lesson14.util;
+package com.javarush.khmelov.util;
 
 public class Key {
     public static final String INDEX = "index";

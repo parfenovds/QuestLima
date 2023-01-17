@@ -1,4 +1,4 @@
-package com.javarush.khmelov.lesson14.repository;
+package com.javarush.khmelov.repository;
 
 import java.util.Collection;
 import java.util.stream.Stream;

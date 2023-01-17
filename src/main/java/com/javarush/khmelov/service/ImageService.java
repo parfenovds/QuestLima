@@ -1,6 +1,6 @@
-package com.javarush.khmelov.lesson14.service;
+package com.javarush.khmelov.service;
 
-import com.javarush.khmelov.lesson14.config.Config;
+import com.javarush.khmelov.config.Config;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;

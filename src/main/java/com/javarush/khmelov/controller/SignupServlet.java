@@ -1,12 +1,12 @@
-package com.javarush.khmelov.lesson14.controller;
+package com.javarush.khmelov.controller;
 
-import com.javarush.khmelov.lesson14.entity.Role;
-import com.javarush.khmelov.lesson14.entity.User;
-import com.javarush.khmelov.lesson14.service.ImageService;
-import com.javarush.khmelov.lesson14.service.UserService;
-import com.javarush.khmelov.lesson14.util.Go;
-import com.javarush.khmelov.lesson14.util.Jsp;
-import com.javarush.khmelov.lesson14.util.Key;
+import com.javarush.khmelov.entity.Role;
+import com.javarush.khmelov.entity.User;
+import com.javarush.khmelov.service.ImageService;
+import com.javarush.khmelov.service.UserService;
+import com.javarush.khmelov.util.Go;
+import com.javarush.khmelov.util.Jsp;
+import com.javarush.khmelov.util.Key;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -16,13 +16,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@SuppressWarnings("serial")
 @WebServlet(name = "SignupServlet", value = Go.SIGNUP)
 @MultipartConfig(fileSizeThreshold = 1 << 20)
 public class SignupServlet extends HttpServlet {
 
-    UserService userService = UserService.USER_SERVICE;
-    ImageService imageService = ImageService.IMAGE_SERVICE;
+    private final UserService userService = UserService.USER_SERVICE;
+    private final ImageService imageService = ImageService.IMAGE_SERVICE;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

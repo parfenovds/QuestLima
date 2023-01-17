@@ -3,14 +3,12 @@
 <c:import url="parts/header.jsp"/>
 <div class="container">
     <jsp:useBean id="user" scope="session"
-                 type="com.javarush.khmelov.lesson14.entity.User"/>
+                 type="com.javarush.khmelov.entity.User"/>
 
     <div class="px-4 py-5 my-5 text-center">
-        <img class="d-block mx-auto mb-4" src="${pageContext.request.contextPath}/web-images/bootstrap-logo.svg" alt=""
-             width="72" height="57">
         <p class="lead mb-4">
         <div class="form-group">
-            <img src="images/${user.image}" width="100" alt="${user.image}">
+            <img src="images/${user.image}" width="250" alt="${user.image}">
         </div>
         <h1 class="display-3 fw-bold">User login: ${user.login}</h1>
         <h3 class="display-5 fw-bold">User role: ${user.role}</h3>

@@ -1,9 +1,9 @@
-package com.javarush.khmelov.lesson14.controller;
+package com.javarush.khmelov.controller;
 
-import com.javarush.khmelov.lesson14.entity.Role;
-import com.javarush.khmelov.lesson14.util.Go;
-import com.javarush.khmelov.lesson14.util.Jsp;
-import com.javarush.khmelov.lesson14.util.Key;
+import com.javarush.khmelov.entity.Role;
+import com.javarush.khmelov.util.Go;
+import com.javarush.khmelov.util.Jsp;
+import com.javarush.khmelov.util.Key;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -13,7 +13,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@SuppressWarnings("serial")
 @WebServlet(name = "IndexServlet", value = Go.ROOT)
 public class IndexServlet extends HttpServlet {
 

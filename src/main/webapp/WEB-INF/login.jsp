@@ -15,7 +15,7 @@
                 <div class="col-md-4">
                     <input id="userLogin" name="login" type="text" placeholder="set login" class="form-control input-md"
                            required=""
-                           value="">
+                           value="admin">
 
                 </div>
             </div>
@@ -26,12 +26,10 @@
                 <div class="col-md-4">
                     <input id="userPassword" name="password" type="password" placeholder="pass req"
                            class="form-control input-md" required=""
-                           value="">
+                           value="qwerty">
 
                 </div>
             </div>
-
-
 
             <!-- Button -->
             <div class=" form-group">

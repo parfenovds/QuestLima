@@ -1,7 +1,7 @@
-package com.javarush.khmelov.lesson14.repository;
+package com.javarush.khmelov.repository;
 
-import com.javarush.khmelov.lesson14.entity.Role;
-import com.javarush.khmelov.lesson14.entity.User;
+import com.javarush.khmelov.entity.Role;
+import com.javarush.khmelov.entity.User;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -16,9 +16,9 @@ public class UserRepository implements Repository<User> {
     public static final AtomicLong id = new AtomicLong(System.currentTimeMillis());
 
     public UserRepository() {
-        map.put(1L, new User(1L, "user", "qwerty", Role.USER));
+        map.put(1L, new User(1L, "user", "user", Role.USER));
         map.put(2L, new User(2L, "guest", "guest", Role.GUEST));
-        map.put(3L, new User(3L, "admin", "admin", Role.ADMIN));
+        map.put(3L, new User(3L, "admin", "qwerty", Role.ADMIN));
     }
 
     @Override

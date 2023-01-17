@@ -1,8 +1,9 @@
-package com.javarush.khmelov.lesson14.util;
+package com.javarush.khmelov.util;
 
 public class Go {
     public static final String SIGNUP = "/signup";
     public static final String LOGIN = "/login";
+    public static final String LOGOUT = "/logout";
     public static final String USER = "/user";
     public static final String USERS = "/users";
     public static final String ROOT = "";

@@ -1,10 +1,10 @@
-package com.javarush.khmelov.lesson14.controller;
+package com.javarush.khmelov.controller;
 
-import com.javarush.khmelov.lesson14.entity.User;
-import com.javarush.khmelov.lesson14.service.UserService;
-import com.javarush.khmelov.lesson14.util.Go;
-import com.javarush.khmelov.lesson14.util.Jsp;
-import com.javarush.khmelov.lesson14.util.Key;
+import com.javarush.khmelov.entity.User;
+import com.javarush.khmelov.service.UserService;
+import com.javarush.khmelov.util.Go;
+import com.javarush.khmelov.util.Jsp;
+import com.javarush.khmelov.util.Key;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -14,7 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collection;
 
-@SuppressWarnings("serial")
 @WebServlet(name = "UsersServlet", value = Go.USERS)
 public class UsersServlet extends HttpServlet {
 

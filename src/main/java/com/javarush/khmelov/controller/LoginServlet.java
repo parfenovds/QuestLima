@@ -1,10 +1,10 @@
-package com.javarush.khmelov.lesson14.controller;
+package com.javarush.khmelov.controller;
 
-import com.javarush.khmelov.lesson14.entity.User;
-import com.javarush.khmelov.lesson14.service.UserService;
-import com.javarush.khmelov.lesson14.util.Go;
-import com.javarush.khmelov.lesson14.util.Jsp;
-import com.javarush.khmelov.lesson14.util.Key;
+import com.javarush.khmelov.entity.User;
+import com.javarush.khmelov.service.UserService;
+import com.javarush.khmelov.util.Go;
+import com.javarush.khmelov.util.Jsp;
+import com.javarush.khmelov.util.Key;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -26,7 +26,7 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         String login = request.getParameter(Key.LOGIN);
         String password = request.getParameter(Key.PASSWORD);
         Optional<User> user = userService.get(login, password);

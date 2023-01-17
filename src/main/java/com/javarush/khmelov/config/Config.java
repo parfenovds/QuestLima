@@ -1,4 +1,4 @@
-package com.javarush.khmelov.lesson14.config;
+package com.javarush.khmelov.config;
 
 import java.net.URI;
 import java.nio.file.Path;
