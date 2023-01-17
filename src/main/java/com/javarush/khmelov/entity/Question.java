@@ -15,7 +15,7 @@ import java.util.Collection;
 public class Question implements AbstractEntity {
     private Long id;
 
-    private Quest quest;
+    private Long questId;
 
     private String text;
 

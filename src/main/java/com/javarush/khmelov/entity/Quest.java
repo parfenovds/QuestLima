@@ -15,16 +15,14 @@ import java.util.Collection;
 public class Quest implements AbstractEntity {
     private Long id;
 
-    private User user;
-
-
     private String name;
 
     private String text;
 
+    private Long authorId;
+
     private Long startQuestionId;
 
-    private final Collection<User> players = new ArrayList<>();
-
     private final Collection<Question> questions = new ArrayList<>();
+
 }

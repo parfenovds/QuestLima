@@ -9,21 +9,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
-public class UserRepository implements Repository<User> {
-
-    private final Map<Long, User> map = new HashMap<>();
-
-    public static final AtomicLong id = new AtomicLong(System.currentTimeMillis());
+public class UserRepository extends BaseRepository<User> {
 
     public UserRepository() {
-        map.put(1L, new User(1L, "user", "user", Role.USER));
-        map.put(2L, new User(2L, "guest", "guest", Role.GUEST));
-        map.put(3L, new User(3L, "admin", "qwerty", Role.ADMIN));
-    }
-
-    @Override
-    public Collection<User> getAll() {
-        return map.values();
+        create(new User(-1L, "admin", "qwerty", Role.ADMIN));
+        create(new User(-1L, "user", "user", Role.USER));
+        create(new User(-1L, "guest", "guest", Role.GUEST));
     }
 
     @Override
@@ -36,28 +27,4 @@ public class UserRepository implements Repository<User> {
                 .filter(u -> nullOrEquals(pattern.getRole(), u.getRole()));
     }
 
-    private boolean nullOrEquals(Object patternField, Object repoField) {
-        return patternField == null || patternField.equals(repoField);
-    }
-
-    @Override
-    public User get(long id) {
-        return map.get(id);
-    }
-
-    @Override
-    public void create(User entity) {
-        entity.setId(id.incrementAndGet());
-        update(entity);
-    }
-
-    @Override
-    public void update(User entity) {
-        map.put(entity.getId(), entity);
-    }
-
-    @Override
-    public void delete(User entity) {
-        map.remove(entity.getId());
-    }
 }
