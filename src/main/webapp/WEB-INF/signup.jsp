@@ -72,7 +72,7 @@
                 <label class="col-md-4 control-label" for="create"></label>
                 <div class="col-md-8">
                     <button id="create" name="create"
-                            class="btn btn-success">"Sign-up"
+                            class="btn btn-success">Sign-up
                     </button>
                 </div>
             </div>

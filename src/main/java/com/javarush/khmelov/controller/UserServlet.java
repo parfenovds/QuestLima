@@ -7,6 +7,7 @@ import com.javarush.khmelov.service.UserService;
 import com.javarush.khmelov.util.Go;
 import com.javarush.khmelov.util.Jsp;
 import com.javarush.khmelov.util.Key;
+import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,6 +26,12 @@ public class UserServlet extends HttpServlet {
 
     private final UserService userService = UserService.USER_SERVICE;
     private final ImageService imageService = ImageService.IMAGE_SERVICE;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        config.getServletContext().setAttribute(Key.ROLES, Role.values());
+        super.init(config);
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -58,7 +65,7 @@ public class UserServlet extends HttpServlet {
         } else if (parameterMap.containsKey("delete")) {
             userService.delete(user);
         } else throw new IllegalStateException("unknown command");
-        imageService.uploadImage(request, user.getId());
+        imageService.uploadImage(request, user.getImage());
         response.sendRedirect(Key.USERS);
     }
 }
