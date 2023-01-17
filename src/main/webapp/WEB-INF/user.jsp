@@ -8,15 +8,32 @@
         <fieldset>
 
             <!-- Form Name -->
-            <legend>User Form</legend>
+            <legend>Edit user profile</legend>
 
             <!-- File Button -->
             <div class="form-group">
-                <label class="col-md-4 control-label" for="image">Avatar</label>
+
+                <label class="col-md-4 control-label" for="image">
+                    <div class="form-group">
+                        <img id="previewId" src="images/${user.image}" width="150" alt="${user.image}">
+                    </div>
+                    Нажмите чтобы изменить
+                </label>
                 <div class="col-md-4">
-                    <input id="image" name="image" class="input-file" type="file">
+                    <input onchange="PreviewImage('image','previewId');" id="image" name="image" style="visibility:hidden;"
+                           class="input-file" type="file">
                 </div>
             </div>
+
+            <script type="text/javascript">
+                function PreviewImage(inputFileId,imageId) {
+                    var oFReader = new FileReader();
+                    oFReader.readAsDataURL(document.getElementById(inputFileId).files[0]);
+                    oFReader.onload = function (oFREvent) {
+                        document.getElementById(imageId).src = oFREvent.target.result;
+                    };
+                };
+            </script>
 
             <input type="hidden" name="id" value="${requestScope.id}">
 
@@ -57,7 +74,7 @@
                 <label class="col-md-4 control-label" for="updateOrCreate"></label>
                 <div class="col-md-8">
                     <button id="updateOrCreate" name="${requestScope.id>0?"update":"create"}"
-                            class="btn btn-success">${requestScope.id>0?"Update":"Crete"}
+                            class="btn btn-success">${requestScope.id>0?"Update":"Create"}
                     </button>
                     <c:if test="${requestScope.id>0}">
                         <button id="delete" name="delete"

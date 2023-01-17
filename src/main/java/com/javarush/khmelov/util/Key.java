@@ -2,6 +2,7 @@ package com.javarush.khmelov.util;
 
 public class Key {
     public static final String INDEX = "index";
+    public static final String CREATE_QUEST = "create-quest";
     public static final String ID = "id";
     public static final String SIGNUP = "signup";
     public static final String LOGIN = "login";

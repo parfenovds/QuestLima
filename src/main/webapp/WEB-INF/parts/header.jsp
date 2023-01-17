@@ -16,14 +16,19 @@
 <header class="bg-light d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
     <a href="${pageContext.request.contextPath}/"
        class="d-flex align-items-left col-md-1 mb-2 mb-md-0 text-dark text-decoration-none">
-       <img src="${pageContext.request.contextPath}/ico/home.png" width="48" alt="Home page">
+        <img src="${pageContext.request.contextPath}/ico/home.png" width="48" alt="Home page">
     </a>
 
     <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+        <%-- guest --%>
         <li><a href="${pageContext.request.contextPath}/" class="nav-link px-2 link-secondary">Home</a></li>
-        <li><a href="users" class="nav-link px-2 link-dark">Пользователи</a></li>
-        <li><a href="#" class="nav-link px-2 link-dark">Создать что-то</a></li>
-        <li><a href="#" class="nav-link px-2 link-dark">Статистика</a></li>
+        <%-- user --%>
+        <li><a href="#" class="nav-link px-2 link-dark disabled">Играть</a></li>
+        <li><a href="#" class="nav-link px-2 link-dark disabled">Статистика</a></li>
+        <%-- admin--%>
+        <li><a href="users" class="nav-link px-2">Пользователи</a></li>
+        <li><a href="create-quest" class="nav-link px-2">Создать квест</a></li>
+        <li><a href="#" class="nav-link px-2 disabled">Редактировать квест</a></li>
     </ul>
 
     <ul class="nav col-md-3 text-end">
