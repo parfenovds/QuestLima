@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.javarush.khmelov</groupId>
-    <artifactId>lesson14</artifactId>
+    <artifactId>questLima</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>lesson13</name>
+    <name>quest-lima-khmelov</name>
     <packaging>war</packaging>
 
     <properties>
