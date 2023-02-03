@@ -11,8 +11,8 @@
 <ul id="nav">
   <li><a href="/">Home</a></li>
   <li><a href="quests">Quests</a></li>
+  <li><a href="quest_creator">Quest Creator</a></li>
   <c:if test="${sessionScope.user != null}">
-    <li><a href="quest_creator">Quest Creator</a></li>
     <li><a href="logout">Logout for ${sessionScope.user.login}</a></li>
   </c:if>
   <c:if test="${sessionScope.user == null}">
