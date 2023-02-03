@@ -1,6 +1,6 @@
 package com.javarush.parfenov.repository;
 
-import com.javarush.parfenov.entity.QtoA;
+import com.javarush.parfenov.entity.ParentToChild;
 import com.javarush.parfenov.exception.QException;
 import com.javarush.parfenov.util.ConnectionManager;
 
@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public enum QtoARepository implements ManyToManyRepository<QtoA> {
+public enum ParentToChildRepository implements ManyToManyRepository<ParentToChild> {
     INSTANCE;
     private static final String CREATE_SQL = """
             INSERT INTO q_to_a_additional_links (quest_id, parent_node_id, child_node_id) VALUES (?, ?, ?)
@@ -39,7 +39,7 @@ public enum QtoARepository implements ManyToManyRepository<QtoA> {
 
 
     @Override
-    public QtoA create(QtoA entity) {
+    public ParentToChild create(ParentToChild entity) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(CREATE_SQL)
         ) {
@@ -56,18 +56,18 @@ public enum QtoARepository implements ManyToManyRepository<QtoA> {
     }
 
     @Override
-    public Collection<QtoA> getAll() {
+    public Collection<ParentToChild> getAll() {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
-            List<QtoA> result = new ArrayList<>();
+            List<ParentToChild> result = new ArrayList<>();
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                QtoA qToA = QtoA.builder()
+                ParentToChild parentToChild = ParentToChild.builder()
                         .questId(resultSet.getLong("quest_id"))
                         .parentNodeId(resultSet.getLong("parent_node_id"))
                         .childNodeId(resultSet.getLong("child_node_id"))
                         .build();
-                result.add(qToA);
+                result.add(parentToChild);
             }
             return result;
         } catch (SQLException e) {
@@ -76,20 +76,20 @@ public enum QtoARepository implements ManyToManyRepository<QtoA> {
     }
 
     @Override
-    public Collection<QtoA> getApproptiate(Long questId, Long parentId) {
+    public Collection<ParentToChild> getApproptiate(Long questId, Long parentId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_APPROPRIATE_SQL)) {
             preparedStatement.setLong(1, questId);
             preparedStatement.setLong(1, parentId);
-            List<QtoA> result = new ArrayList<>();
+            List<ParentToChild> result = new ArrayList<>();
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                QtoA qToA = QtoA.builder()
+                ParentToChild parentToChild = ParentToChild.builder()
                         .questId(resultSet.getLong("quest_id"))
                         .parentNodeId(resultSet.getLong("parent_node_id"))
                         .childNodeId(resultSet.getLong("child_node_id"))
                         .build();
-                result.add(qToA);
+                result.add(parentToChild);
             }
             return result;
         } catch (SQLException e) {
@@ -98,34 +98,34 @@ public enum QtoARepository implements ManyToManyRepository<QtoA> {
     }
 
     @Override
-    public Optional<QtoA> get(Long questId, Long parentId, Long childId) {
+    public Optional<ParentToChild> get(Long questId, Long parentId, Long childId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_UNIQUE)) {
             preparedStatement.setLong(1, questId);
             preparedStatement.setLong(2, parentId);
             preparedStatement.setLong(3, childId);
-            QtoA qToA = getQtoA(preparedStatement);
-            return Optional.ofNullable(qToA);
+            ParentToChild parentToChild = getParentToChild(preparedStatement);
+            return Optional.ofNullable(parentToChild);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static QtoA getQtoA(PreparedStatement preparedStatement) throws SQLException {
+    private static ParentToChild getParentToChild(PreparedStatement preparedStatement) throws SQLException {
         ResultSet resultSet = preparedStatement.executeQuery();
-        QtoA qToA = null;
+        ParentToChild parentToChild = null;
         if (resultSet.next()) {
-            qToA = QtoA.builder()
+            parentToChild = ParentToChild.builder()
                     .questId(resultSet.getLong("quest_id"))
                     .parentNodeId(resultSet.getLong("parent_node_id"))
                     .childNodeId(resultSet.getLong("child_node_id"))
                     .build();
         }
-        return qToA;
+        return parentToChild;
     }
 
     @Override
-    public boolean update(QtoA entity) {
+    public boolean update(ParentToChild entity) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setLong(1, entity.getQuestId());
@@ -151,7 +151,7 @@ public enum QtoARepository implements ManyToManyRepository<QtoA> {
     }
 
     @Override
-    public boolean delete(QtoA entity) {
+    public boolean delete(ParentToChild entity) {
         return delete(entity.getQuestId(), entity.getParentNodeId(), entity.getChildNodeId());
     }
 }

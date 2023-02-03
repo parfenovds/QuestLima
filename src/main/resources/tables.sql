@@ -61,11 +61,3 @@ create table if not exists q_to_a_additional_links
     child_node_id  bigint not null,
     primary key (quest_id, parent_node_id, child_node_id)
 );
-
-create table if not exists a_to_q_additional_links
-(
-    quest_id       bigint not null,
-    parent_node_id bigint not null,
-    child_node_id  bigint not null,
-    primary key (quest_id, parent_node_id, child_node_id)
-);

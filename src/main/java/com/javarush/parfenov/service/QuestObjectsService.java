@@ -2,21 +2,19 @@ package com.javarush.parfenov.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javarush.parfenov.entity.Answer;
-import com.javarush.parfenov.entity.AnswerType;
-import com.javarush.parfenov.entity.Question;
-import com.javarush.parfenov.entity.QuestionType;
+import com.javarush.parfenov.entity.*;
 import com.javarush.parfenov.repository.AnswerRepository;
+import com.javarush.parfenov.repository.ParentToChildRepository;
 import com.javarush.parfenov.repository.QuestionRepository;
 import lombok.SneakyThrows;
 
-import java.net.URL;
 import java.util.Iterator;
 
 public enum QuestObjectsService {
     INSTANCE;
-    private static final QuestionRepository questionRepository = QuestionRepository.INSTANCE;
-    private static final AnswerRepository answerRepository = AnswerRepository.INSTANCE;
+    private static final QuestionRepository QUESTION_REPOSITORY = QuestionRepository.INSTANCE;
+    private static final AnswerRepository ANSWER_REPOSITORY = AnswerRepository.INSTANCE;
+    private static final ParentToChildRepository PARENT_TO_CHILD_REPOSITORY = ParentToChildRepository.INSTANCE;
     private static final Long QUEST_ID = 1L;
 
     @SneakyThrows
@@ -28,36 +26,49 @@ public enum QuestObjectsService {
 
     private void putQuestion(JsonNode node) {
         Question question = Question.builder()
+                .nodeId(node.get("node_id").asLong())
                 .shortName(node.get("name").asText())
                 .text(node.get("text").asText())
                 .questId(QUEST_ID)
                 .type(QuestionType.valueOf(node.get("type").asText().toUpperCase()))
                 .build();
-        questionRepository.create(question);
+        QUESTION_REPOSITORY.create(question);
+
     }
 
-    private void putAnswer(JsonNode node, String questionId, String nextQuestionId) {
+    private void addAdditionalLinks(JsonNode node) {
+        if(node.has("additional_linked_nodes")) {
+            long nodeId = node.get("node_id").asLong();
+            JsonNode additionalLinkedNodes = node.get("additional_linked_nodes");
+            if(!additionalLinkedNodes.isEmpty()) {
+                for (JsonNode linkedNode : additionalLinkedNodes) {
+                    putParentToChild(nodeId, linkedNode);
+                }
+            }
+        }
+    }
+
+    private void putParentToChild(long nodeId, JsonNode linkedNode) {
+        ParentToChild parentToChild = ParentToChild.builder()
+                .questId(QUEST_ID)
+                .parentNodeId(nodeId)
+                .childNodeId(linkedNode.get("node_id").asLong())
+                .build();
+        System.out.println(parentToChild);
+        PARENT_TO_CHILD_REPOSITORY.create(parentToChild);
+    }
+
+    private void putAnswer(JsonNode node) {
         Answer answer = Answer.builder()
+                .nodeId(node.get("node_id").asLong())
                 .shortName(node.get("name").asText())
                 .text(node.get("text").asText())
-                .questionId(Long.valueOf(questionId))
+                .questionId(node.get("node_parent").asLong())
                 .questId(QUEST_ID)
                 .type(AnswerType.valueOf(node.get("type").asText().toUpperCase()))
-                .nextQuestionId(Long.valueOf(nextQuestionId))
+                .nextQuestionId(node.get("lonely_child").asLong())
                 .build();
-        System.out.println(answer);
-        answerRepository.create(answer);
-//        System.out.println("Answer node put: ");
-//        System.out.println(node);
-//        System.out.printf("Bind to %s question id; next question id is %s%n", questionId, nextQuestionId);
-    }
-
-    private void putQToALink(Long parentId, Long childId) {
-
-    }
-
-    private void putAToQLink(Long parentId, Long childId) {
-
+        ANSWER_REPOSITORY.create(answer);
     }
 
     private void treeConverter(JsonNode root) {
@@ -84,10 +95,11 @@ public enum QuestObjectsService {
     }
 
     private void extracted(JsonNode node) {
+        addAdditionalLinks(node);
         if(node.get("type").asText().equals("question")) {
             putQuestion(node);
         } else {
-            putAnswer(node, node.get("node_parent").asText(), node.get("lonely_child").asText());
+            putAnswer(node);
         }
         if (node.has("children")) {
             lowerConverter(node);
