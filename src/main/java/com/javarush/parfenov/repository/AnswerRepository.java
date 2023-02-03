@@ -14,10 +14,10 @@ import java.util.Optional;
 public enum AnswerRepository implements TwoPrimaryKeyRepository<Answer> {
     INSTANCE;
     private static final String CREATE_SQL = """
-            INSERT INTO answers (node_id, short_name, text, question_id, quest_id, type, next_question_id) VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO answers (node_id, short_name, text, parent_id, quest_id, type, next_question_id) VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
     private static final String FIND_ALL_SQL = """
-            SELECT node_id, short_name, text, question_id, quest_id, type, next_question_id FROM answers
+            SELECT node_id, short_name, text, parent_id, quest_id, type, next_question_id FROM answers
             """;
     private static final String FIND_SQL = FIND_ALL_SQL + """
             WHERE node_id = ? AND quest_id = ?
@@ -27,7 +27,7 @@ public enum AnswerRepository implements TwoPrimaryKeyRepository<Answer> {
             SET node_id = ?,
                 short_name = ?,
                 text = ?,
-                question_id = ?,
+                parent_id = ?,
                 quest_id = ?,
                 type = ?,
                 next_question_id = ?
@@ -47,7 +47,7 @@ public enum AnswerRepository implements TwoPrimaryKeyRepository<Answer> {
             preparedStatement.setLong(1, entity.getNodeId());
             preparedStatement.setString(2, entity.getShortName());
             preparedStatement.setString(3, entity.getText());
-            preparedStatement.setLong(4, entity.getQuestionId());
+            preparedStatement.setLong(4, entity.getParentId());
             preparedStatement.setLong(5, entity.getQuestId());
             preparedStatement.setString(6, entity.getType().name());
             preparedStatement.setLong(7, entity.getNextQuestionId());
@@ -69,7 +69,7 @@ public enum AnswerRepository implements TwoPrimaryKeyRepository<Answer> {
                         .nodeId(resultSet.getLong("node_id"))
                         .shortName(resultSet.getString("short_name"))
                         .text(resultSet.getString("text"))
-                        .questionId(resultSet.getLong("question_id"))
+                        .parentId(resultSet.getLong("question_id"))
                         .questId(resultSet.getLong("quest_id"))
                         .type(AnswerType.valueOf(resultSet.getString("type")))
                         .questId(resultSet.getLong("next_question_id"))
@@ -103,7 +103,7 @@ public enum AnswerRepository implements TwoPrimaryKeyRepository<Answer> {
                     .nodeId(resultSet.getLong("id"))
                     .shortName(resultSet.getString("short_name"))
                     .text(resultSet.getString("text"))
-                    .questionId(resultSet.getLong("question_id"))
+                    .parentId(resultSet.getLong("question_id"))
                     .questId(resultSet.getLong("quest_id"))
                     .type(AnswerType.valueOf(resultSet.getString("type")))
                     .questId(resultSet.getLong("next_question_id"))
@@ -119,7 +119,7 @@ public enum AnswerRepository implements TwoPrimaryKeyRepository<Answer> {
             preparedStatement.setLong(1, entity.getNodeId());
             preparedStatement.setString(2, entity.getShortName());
             preparedStatement.setString(3, entity.getText());
-            preparedStatement.setLong(4, entity.getQuestionId());
+            preparedStatement.setLong(4, entity.getParentId());
             preparedStatement.setLong(5, entity.getQuestId());
             preparedStatement.setString(6, entity.getType().name());
             preparedStatement.setLong(7, entity.getNextQuestionId());

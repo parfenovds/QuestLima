@@ -36,6 +36,7 @@ create table if not exists questions
     node_id    bigint       not null,
     short_name varchar(128) not null,
     text       text         not null,
+    parent_id        bigint       not null,
     quest_id   bigint       not null references quests,
     type       varchar(16)  not null references question_types,
     primary key (node_id, quest_id)
@@ -47,7 +48,7 @@ create table if not exists answers
     node_id          bigint       not null,
     short_name       varchar(128) not null,
     text             text         not null,
-    question_id      bigint       not null,
+    parent_id        bigint       not null,
     quest_id         bigint       not null references quests,
     type             varchar(16)  not null references answer_types,
     next_question_id bigint,

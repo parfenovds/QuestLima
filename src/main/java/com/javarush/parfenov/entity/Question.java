@@ -13,6 +13,7 @@ public class Question {
     private Long nodeId;
     private String shortName;
     private String text;
+    private Long parentId;
     private Long questId;
     private QuestionType type;
 }

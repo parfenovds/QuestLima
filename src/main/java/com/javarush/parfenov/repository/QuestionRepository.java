@@ -14,19 +14,24 @@ import java.util.Optional;
 public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
     INSTANCE;
     private static final String CREATE_SQL = """
-            INSERT INTO questions (node_id, short_name, text, quest_id, type) VALUES (?, ?, ?, ?, ?)
+            INSERT INTO questions (node_id, short_name, text, parent_id, quest_id, type) VALUES (?, ?, ?, ?, ?, ?)
             """;
     private static final String FIND_ALL_SQL = """
-            SELECT node_id, short_name, text, quest_id, type FROM questions
+            SELECT node_id, short_name, text, parent_id, quest_id, type, type FROM questions
             """;
     private static final String FIND_SQL = FIND_ALL_SQL + """
             WHERE node_id = ? AND quest_id = ?
+            """;
+
+    private static final String FIND_BY_TYPE_AND_QUEST_ID_SQL = FIND_ALL_SQL + """
+            WHERE type = ? AND quest_id = ?
             """;
     private static final String UPDATE_SQL = """
             UPDATE questions
             SET node_id = ?,
                 short_name = ?,
                 text = ?,
+                parent_id = ?,
                 quest_id = ?,
                 type = ?
             WHERE node_id = ? AND quest_id = ?
@@ -45,8 +50,9 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
             preparedStatement.setLong(1, entity.getNodeId());
             preparedStatement.setString(2, entity.getShortName());
             preparedStatement.setString(3, entity.getText());
-            preparedStatement.setLong(4, entity.getQuestId());
-            preparedStatement.setString(5, entity.getType().name());
+            preparedStatement.setLong(4, entity.getParentId());
+            preparedStatement.setLong(5, entity.getQuestId());
+            preparedStatement.setString(6, entity.getType().name());
             preparedStatement.execute();
             return entity;
         } catch (SQLException e) {
@@ -65,6 +71,7 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
                         .nodeId(resultSet.getLong("node_id"))
                         .shortName(resultSet.getString("short_name"))
                         .text(resultSet.getString("text"))
+                        .parentId(resultSet.getLong("parent_id"))
                         .questId(resultSet.getLong("quest_id"))
                         .type(QuestionType.valueOf(resultSet.getString("type")))
                         .build();
@@ -89,6 +96,18 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
         }
     }
 
+    public Optional<Question> getByType(QuestionType questionType, Long questId) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_TYPE_AND_QUEST_ID_SQL)) {
+            preparedStatement.setString(1, questionType.name());
+            preparedStatement.setLong(2, questId);
+            Question question = getQuestion(preparedStatement);
+            return Optional.ofNullable(question);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private static Question getQuestion(PreparedStatement preparedStatement) throws SQLException {
         ResultSet resultSet = preparedStatement.executeQuery();
         Question question = null;
@@ -97,6 +116,7 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
                     .nodeId(resultSet.getLong("node_id"))
                     .shortName(resultSet.getString("short_name"))
                     .text(resultSet.getString("text"))
+                    .parentId(resultSet.getLong("parent_id"))
                     .questId(resultSet.getLong("quest_id"))
                     .type(QuestionType.valueOf(resultSet.getString("type")))
                     .build();
@@ -111,8 +131,9 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
             preparedStatement.setLong(1, entity.getQuestId());
             preparedStatement.setString(2, entity.getShortName());
             preparedStatement.setString(3, entity.getText());
-            preparedStatement.setLong(4, entity.getQuestId());
-            preparedStatement.setString(5, entity.getType().name());
+            preparedStatement.setLong(4, entity.getParentId());
+            preparedStatement.setLong(5, entity.getQuestId());
+            preparedStatement.setString(6, entity.getType().name());
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);

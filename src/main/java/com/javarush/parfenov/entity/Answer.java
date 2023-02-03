@@ -13,7 +13,7 @@ public class Answer {
     private Long nodeId;
     private String shortName;
     private String text;
-    private Long questionId;
+    private Long parentId;
     private Long questId;
     private AnswerType type;
     private Long nextQuestionId;
