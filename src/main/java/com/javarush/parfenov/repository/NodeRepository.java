@@ -1,7 +1,7 @@
 package com.javarush.parfenov.repository;
 
-import com.javarush.parfenov.entity.Question;
-import com.javarush.parfenov.entity.QuestionType;
+import com.javarush.parfenov.entity.Node;
+import com.javarush.parfenov.entity.NodeType;
 import com.javarush.parfenov.exception.QException;
 import com.javarush.parfenov.util.ConnectionManager;
 
@@ -11,13 +11,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
+public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
     INSTANCE;
     private static final String CREATE_SQL = """
-            INSERT INTO questions (node_id, short_name, text, parent_id, quest_id, type) VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO nodes (node_id, short_name, text, parent_id, quest_id, type, next_lonely_id) VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
     private static final String FIND_ALL_SQL = """
-            SELECT node_id, short_name, text, parent_id, quest_id, type, type FROM questions
+            SELECT node_id, short_name, text, parent_id, quest_id, type, next_lonely_id FROM nodes
             """;
     private static final String FIND_SQL = FIND_ALL_SQL + """
             WHERE node_id = ? AND quest_id = ?
@@ -26,24 +26,29 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
     private static final String FIND_BY_TYPE_AND_QUEST_ID_SQL = FIND_ALL_SQL + """
             WHERE type = ? AND quest_id = ?
             """;
+
+    private static final String FIND_BY_PARENT_ID_AND_QUEST_ID_SQL = FIND_ALL_SQL + """
+            WHERE parent_id = ? AND quest_id = ?
+            """;
     private static final String UPDATE_SQL = """
-            UPDATE questions
+            UPDATE nodes
             SET node_id = ?,
                 short_name = ?,
                 text = ?,
                 parent_id = ?,
                 quest_id = ?,
-                type = ?
+                type = ?,
+                next_lonely_id = ?
             WHERE node_id = ? AND quest_id = ?
             """;
     private static final String DELETE_SQL = """
-            DELETE FROM questions
+            DELETE FROM nodes
             WHERE node_id = ? AND quest_id = ?
             """;
 
 
     @Override
-    public Question create(Question entity) {
+    public Node create(Node entity) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(CREATE_SQL)
         ) {
@@ -53,6 +58,7 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
             preparedStatement.setLong(4, entity.getParentId());
             preparedStatement.setLong(5, entity.getQuestId());
             preparedStatement.setString(6, entity.getType().name());
+            preparedStatement.setLong(7, entity.getNextLonelyId());
             preparedStatement.execute();
             return entity;
         } catch (SQLException e) {
@@ -61,21 +67,22 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
     }
 
     @Override
-    public Collection<Question> getAll() {
+    public Collection<Node> getAll() {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
-            List<Question> result = new ArrayList<>();
+            List<Node> result = new ArrayList<>();
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
-                Question question = Question.builder()
+                Node node = Node.builder()
                         .nodeId(resultSet.getLong("node_id"))
                         .shortName(resultSet.getString("short_name"))
                         .text(resultSet.getString("text"))
                         .parentId(resultSet.getLong("parent_id"))
                         .questId(resultSet.getLong("quest_id"))
-                        .type(QuestionType.valueOf(resultSet.getString("type")))
+                        .type(NodeType.valueOf(resultSet.getString("type")))
+                        .nextLonelyId(resultSet.getLong("next_lonely_id"))
                         .build();
-                result.add(question);
+                result.add(node);
             }
             return result;
         } catch (SQLException e) {
@@ -83,49 +90,78 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
         }
     }
 
-    @Override
-    public Optional<Question> get(Long nodeId, Long questId) {
+    public Collection<Node> getByParentId(Long parentId, Long questId) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_PARENT_ID_AND_QUEST_ID_SQL)) {
+            preparedStatement.setLong(1, parentId);
+            preparedStatement.setLong(2, questId);
+            List<Node> result = new ArrayList<>();
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Node node = Node.builder()
+                        .nodeId(resultSet.getLong("node_id"))
+                        .shortName(resultSet.getString("short_name"))
+                        .text(resultSet.getString("text"))
+                        .parentId(resultSet.getLong("parent_id"))
+                        .questId(resultSet.getLong("quest_id"))
+                        .type(NodeType.valueOf(resultSet.getString("type")))
+                        .nextLonelyId(resultSet.getLong("next_lonely_id"))
+                        .build();
+                result.add(node);
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+        @Override
+    public Optional<Node> get(Long nodeId, Long questId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_SQL)) {
             preparedStatement.setLong(1, nodeId);
             preparedStatement.setLong(2, questId);
-            Question question = getQuestion(preparedStatement);
-            return Optional.ofNullable(question);
+            Node node = getNode(preparedStatement);
+            return Optional.ofNullable(node);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Optional<Question> getByType(QuestionType questionType, Long questId) {
+//TODO: it should return collection!!!
+    public Optional<Node> getByType(NodeType nodeType, Long questId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_TYPE_AND_QUEST_ID_SQL)) {
-            preparedStatement.setString(1, questionType.name());
+            preparedStatement.setString(1, nodeType.name());
             preparedStatement.setLong(2, questId);
-            Question question = getQuestion(preparedStatement);
-            return Optional.ofNullable(question);
+            Node node = getNode(preparedStatement);
+            return Optional.ofNullable(node);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private static Question getQuestion(PreparedStatement preparedStatement) throws SQLException {
+
+
+    private static Node getNode(PreparedStatement preparedStatement) throws SQLException {
         ResultSet resultSet = preparedStatement.executeQuery();
-        Question question = null;
+        Node node = null;
         if (resultSet.next()) {
-            question = Question.builder()
+            node = Node.builder()
                     .nodeId(resultSet.getLong("node_id"))
                     .shortName(resultSet.getString("short_name"))
                     .text(resultSet.getString("text"))
                     .parentId(resultSet.getLong("parent_id"))
                     .questId(resultSet.getLong("quest_id"))
-                    .type(QuestionType.valueOf(resultSet.getString("type")))
+                    .type(NodeType.valueOf(resultSet.getString("type")))
+                    .nextLonelyId(resultSet.getLong("next_lonely_id"))
                     .build();
         }
-        return question;
+        return node;
     }
 
     @Override
-    public boolean update(Question entity) {
+    public boolean update(Node entity) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setLong(1, entity.getQuestId());
@@ -134,6 +170,7 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
             preparedStatement.setLong(4, entity.getParentId());
             preparedStatement.setLong(5, entity.getQuestId());
             preparedStatement.setString(6, entity.getType().name());
+            preparedStatement.setLong(7, entity.getNextLonelyId());
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -153,7 +190,7 @@ public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
     }
 
     @Override
-    public boolean delete(Question entity) {
+    public boolean delete(Node entity) {
         return delete(entity.getNodeId(), entity.getQuestId());
     }
 }

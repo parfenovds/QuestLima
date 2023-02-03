@@ -9,11 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Question {
+public class Node {
     private Long nodeId;
     private String shortName;
     private String text;
     private Long parentId;
     private Long questId;
-    private QuestionType type;
+    private NodeType type;
+    private Long nextLonelyId;
 }

@@ -3,7 +3,7 @@ const selectedRadius = 8;
 const allowedOptionsForSelect = new Map();
 const parentToAllowedOptionsForSelect = new Map();
 
-treeJSON = d3.json("JSON/flare.json", function (error, treeData) {
+treeJSON = d3.json("JSON/test.json", function (error, treeData) {
 
     allowedOptionsForSelect.set('init', []);
     allowedOptionsForSelect.set('win', ['fail', 'question']);
@@ -293,7 +293,7 @@ treeJSON = d3.json("JSON/flare.json", function (error, treeData) {
                 'text': "put your text here",
                 'type': str,
                 'node_parent': lastSelectedNodeData.node_id,
-                'lonely_child': ""
+                'lonely_child': "0"
             });
             update(root);
             console.log("?" + lastSelectedNodeData.children);
@@ -309,8 +309,8 @@ treeJSON = d3.json("JSON/flare.json", function (error, treeData) {
             lastSelectedNodeData.parent.children.forEach(function (child) {
                 if (child !== lastSelectedNodeData) {
                     children.push(child);
-                } else if (lastSelectedNodeData.parent.lonely_child !== "") {
-                    lastSelectedNodeData.parent.lonely_child = "";
+                } else if (lastSelectedNodeData.parent.lonely_child !== "0") {
+                    lastSelectedNodeData.parent.lonely_child = "0";
                 }
             });
             lastSelectedNodeData.parent.children = children;
@@ -484,7 +484,7 @@ treeJSON = d3.json("JSON/flare.json", function (error, treeData) {
         parentLink = tree.links(tree.nodes(draggingNode.parent));
         svgGroup.selectAll('path.link').filter(function (d, i) {
             if (d.target.id == draggingNode.id) {
-                if (d.target.parent.lonely_child !== "") {
+                if (d.target.parent.lonely_child !== "0") {
                     lastParentToCut = d.target.parent;
                     console.log("WOOOSH!");
                     console.log(d.target.parent.lonely_child);
@@ -602,7 +602,7 @@ treeJSON = d3.json("JSON/flare.json", function (error, treeData) {
             update(root);
             if (lastParentToCut != null && lastParentToCut.type === "answer" && lastParentToCut !== draggingNode.parent) {
                 draggingNode.parent.lonely_child = lastParentToCut.lonely_child;
-                lastParentToCut.lonely_child = "";
+                lastParentToCut.lonely_child = "0";
             }
             draggingNode.node_parent = draggingNode.parent.node_id;
             centerNode(draggingNode);

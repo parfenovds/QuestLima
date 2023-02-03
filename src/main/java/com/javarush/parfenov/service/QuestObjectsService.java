@@ -3,17 +3,15 @@ package com.javarush.parfenov.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javarush.parfenov.entity.*;
-import com.javarush.parfenov.repository.AnswerRepository;
 import com.javarush.parfenov.repository.ParentToChildRepository;
-import com.javarush.parfenov.repository.QuestionRepository;
+import com.javarush.parfenov.repository.NodeRepository;
 import lombok.SneakyThrows;
 
 import java.util.Iterator;
 
 public enum QuestObjectsService {
     INSTANCE;
-    private static final QuestionRepository QUESTION_REPOSITORY = QuestionRepository.INSTANCE;
-    private static final AnswerRepository ANSWER_REPOSITORY = AnswerRepository.INSTANCE;
+    private static final NodeRepository NODE_REPOSITORY = NodeRepository.INSTANCE;
     private static final ParentToChildRepository PARENT_TO_CHILD_REPOSITORY = ParentToChildRepository.INSTANCE;
     private static final Long QUEST_ID = 1L;
 
@@ -24,24 +22,52 @@ public enum QuestObjectsService {
         treeConverter(root);
     }
 
-    private void putQuestion(JsonNode node) {
-        Question question = Question.builder()
+    private void treeConverter(JsonNode root) {
+        Iterator<JsonNode> iterator = root.iterator();
+        putNode(root);
+        while (iterator.hasNext()) {
+            upperConverter(iterator);
+        }
+    }
+
+    private void putNode(JsonNode node) {
+        Node builtNode = Node.builder()
                 .nodeId(node.get("node_id").asLong())
                 .shortName(node.get("name").asText())
                 .parentId(node.get("node_parent").asLong())
                 .text(node.get("text").asText())
                 .questId(QUEST_ID)
-                .type(QuestionType.valueOf(node.get("type").asText().toUpperCase()))
+                .type(NodeType.valueOf(node.get("type").asText().toUpperCase()))
+                .nextLonelyId(node.get("lonely_child").asLong())
                 .build();
-        QUESTION_REPOSITORY.create(question);
+//        System.out.println(builtNode);
+        NODE_REPOSITORY.create(builtNode);
 
     }
 
+    private void upperConverter(Iterator<JsonNode> iterator) {
+        JsonNode next = iterator.next();
+        if (next.isArray()) {
+            for (JsonNode node : next) {
+                extracted(node);
+            }
+        }
+    }
+
+    private void extracted(JsonNode node) {
+        addAdditionalLinks(node);
+        putNode(node);
+        if (node.has("children")) {
+            lowerConverter(node);
+        }
+    }
+
     private void addAdditionalLinks(JsonNode node) {
-        if(node.has("additional_linked_nodes")) {
+        if (node.has("additional_linked_nodes")) {
+            System.out.println("HOOOO");
             long nodeId = node.get("node_id").asLong();
             JsonNode additionalLinkedNodes = node.get("additional_linked_nodes");
-            if(!additionalLinkedNodes.isEmpty()) {
+            if (!additionalLinkedNodes.isEmpty()) {
                 for (JsonNode linkedNode : additionalLinkedNodes) {
                     putParentToChild(nodeId, linkedNode);
                 }
@@ -55,55 +81,14 @@ public enum QuestObjectsService {
                 .parentNodeId(nodeId)
                 .childNodeId(linkedNode.get("node_id").asLong())
                 .build();
-        System.out.println(parentToChild);
+//        System.out.println(parentToChild);
         PARENT_TO_CHILD_REPOSITORY.create(parentToChild);
     }
 
-    private void putAnswer(JsonNode node) {
-        Answer answer = Answer.builder()
-                .nodeId(node.get("node_id").asLong())
-                .shortName(node.get("name").asText())
-                .text(node.get("text").asText())
-                .parentId(node.get("node_parent").asLong())
-                .questId(QUEST_ID)
-                .type(AnswerType.valueOf(node.get("type").asText().toUpperCase()))
-                .nextQuestionId(node.get("lonely_child").asLong())
-                .build();
-        ANSWER_REPOSITORY.create(answer);
-    }
-
-    private void treeConverter(JsonNode root) {
-        Iterator<JsonNode> iterator = root.iterator();
-        putQuestion(root);
-        while (iterator.hasNext()) {
-            upperConverter(iterator);
-        }
-    }
-
-    private void upperConverter(Iterator<JsonNode> iterator) {
-        JsonNode next = iterator.next();
-        if (next.isArray()) {
-            for (JsonNode node : next) {
-                extracted(node);
-            }
-        }
-    }
 
     private void lowerConverter(JsonNode node) {
         for (JsonNode children : node.get("children")) {
             extracted(children);
-        }
-    }
-
-    private void extracted(JsonNode node) {
-        addAdditionalLinks(node);
-        if(node.get("type").asText().equals("question")) {
-            putQuestion(node);
-        } else {
-            putAnswer(node);
-        }
-        if (node.has("children")) {
-            lowerConverter(node);
         }
     }
 }

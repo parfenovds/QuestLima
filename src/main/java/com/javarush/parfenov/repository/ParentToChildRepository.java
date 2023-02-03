@@ -80,7 +80,7 @@ public enum ParentToChildRepository implements ManyToManyRepository<ParentToChil
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_APPROPRIATE_SQL)) {
             preparedStatement.setLong(1, questId);
-            preparedStatement.setLong(1, parentId);
+            preparedStatement.setLong(2, parentId);
             List<ParentToChild> result = new ArrayList<>();
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
