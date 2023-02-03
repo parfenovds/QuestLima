@@ -11,6 +11,10 @@ import java.io.IOException;
 public class QuestCreatorServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        String parameter = request.getParameter("id");
+//        if(parameter != null) {
+//            request.getSession().setAttribute();
+//        }
         JSP.forward(request, response, "quest_creator");
     }
 

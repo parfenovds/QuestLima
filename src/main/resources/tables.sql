@@ -22,7 +22,8 @@ create table if not exists quests
 (
     id      bigserial primary key,
     user_id bigint not null references users,
-    text    text
+    text    text,
+    text name
 );
 
 create table if not exists nodes

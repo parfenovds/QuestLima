@@ -13,18 +13,25 @@ import java.util.Optional;
 public enum QuestRepository implements Repository<Quest> {
     INSTANCE;
     private static final String CREATE_SQL = """
-            INSERT INTO quests (user_id, text) VALUES (?, ?)
+            INSERT INTO quests (user_id, text, name) VALUES (?, ?, ?)
             """;
     private static final String FIND_ALL_SQL = """
-            SELECT id, user_id, text FROM quests
+            SELECT id, user_id, text, name FROM quests
             """;
     private static final String FIND_SQL = FIND_ALL_SQL + """
             WHERE id = ?
             """;
+
+    private static final String FIND_BY_USER_LOGIN_SQL = """
+            SELECT q.id, q.user_id, q.text, q.name, u.login FROM quests q
+            JOIN users u on u.id = q.user_id
+            WHERE login = ?;
+            """;
     private static final String UPDATE_SQL = """
             UPDATE quests
             SET user_id = ?,
-                text = ?
+                text = ?,
+                name = ?
             WHERE id = ?
             """;
     private static final String DELETE_SQL = """
@@ -40,6 +47,7 @@ public enum QuestRepository implements Repository<Quest> {
         ) {
             preparedStatement.setLong(1, entity.getUserId());
             preparedStatement.setString(2, entity.getText());
+            preparedStatement.setString(3, entity.getName());
             preparedStatement.execute();
             ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
             generatedKeys.next();
@@ -61,6 +69,28 @@ public enum QuestRepository implements Repository<Quest> {
                         .id(resultSet.getLong("id"))
                         .userId(resultSet.getLong("user_id"))
                         .text(resultSet.getString("text"))
+                        .name(resultSet.getString("name"))
+                        .build();
+                result.add(quest);
+            }
+            return result;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public Collection<Quest> getByUserLogin(String login) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_USER_LOGIN_SQL)) {
+            preparedStatement.setString(1, login);
+            List<Quest> result = new ArrayList<>();
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                Quest quest = Quest.builder()
+                        .id(resultSet.getLong("id"))
+                        .userId(resultSet.getLong("user_id"))
+                        .text(resultSet.getString("text"))
+                        .name(resultSet.getString("name"))
                         .build();
                 result.add(quest);
             }
@@ -90,6 +120,7 @@ public enum QuestRepository implements Repository<Quest> {
                     .id(resultSet.getLong("id"))
                     .userId(resultSet.getLong("user_id"))
                     .text(resultSet.getString("text"))
+                    .name(resultSet.getString("name"))
                     .build();
         }
         return quest;
@@ -101,7 +132,8 @@ public enum QuestRepository implements Repository<Quest> {
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
             preparedStatement.setLong(1, entity.getUserId());
             preparedStatement.setString(2, entity.getText());
-            preparedStatement.setLong(3, entity.getId());
+            preparedStatement.setString(3, entity.getName());
+            preparedStatement.setLong(4, entity.getId());
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);

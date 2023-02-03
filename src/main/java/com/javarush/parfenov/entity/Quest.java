@@ -13,4 +13,5 @@ public class Quest {
     private Long id;
     private Long userId;
     private String text;
+    private String name;
 }

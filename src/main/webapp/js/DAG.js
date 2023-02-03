@@ -2,6 +2,7 @@
 const selectedRadius = 8;
 const allowedOptionsForSelect = new Map();
 const parentToAllowedOptionsForSelect = new Map();
+let questId = d3.select('.tt').attr('id');
 
 treeJSON = d3.json("JSON/test.json", function (error, treeData) {
 

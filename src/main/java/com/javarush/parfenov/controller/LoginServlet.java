@@ -5,6 +5,7 @@ import com.javarush.parfenov.dto.UserDto;
 import com.javarush.parfenov.entity.Role;
 import com.javarush.parfenov.entity.User;
 import com.javarush.parfenov.exception.ValidationException;
+import com.javarush.parfenov.service.QuestService;
 import com.javarush.parfenov.service.UserService;
 import com.javarush.parfenov.util.JSP;
 import jakarta.servlet.*;
@@ -17,7 +18,8 @@ import java.util.Optional;
 @WebServlet(name = "LoginServlet", value = "/login")
 public class LoginServlet extends HttpServlet {
 
-    private final UserService userService = UserService.INSTANCE;
+    private static final UserService userService = UserService.INSTANCE;
+    private static final QuestService QUEST_SERVICE = QuestService.INSTANCE;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -38,7 +40,9 @@ public class LoginServlet extends HttpServlet {
                 .build();
         Optional<UserDto> userDto = userService.login(createUserDto.getLogin(), createUserDto.getPassword());
         if (userDto.isPresent()) {
-            request.getSession().setAttribute("user", userDto.get());
+            HttpSession session = request.getSession();
+            session.setAttribute("user", userDto.get());
+            session.setAttribute("quests", QUEST_SERVICE.getQuestDtoByUserLogin(userDto.get().getLogin()));
             JSP.forward(request, response, "quests");
         } else {
             request.setAttribute("loginError", "login or password is incorrect");
