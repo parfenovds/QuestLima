@@ -11,48 +11,47 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public enum AnswerRepository implements Repository<Answer> {
+public enum AnswerRepository implements TwoPrimaryKeyRepository<Answer> {
     INSTANCE;
     private static final String CREATE_SQL = """
-            INSERT INTO answers (short_name, text, question_id, quest_id, type, next_question_id) VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO answers (node_id, short_name, text, question_id, quest_id, type, next_question_id) VALUES (?, ?, ?, ?, ?, ?, ?)
             """;
     private static final String FIND_ALL_SQL = """
-            SELECT id, short_name, text, question_id, quest_id, type, next_question_id FROM answers
+            SELECT node_id, short_name, text, question_id, quest_id, type, next_question_id FROM answers
             """;
     private static final String FIND_SQL = FIND_ALL_SQL + """
-            WHERE id = ?
+            WHERE node_id = ? AND quest_id = ?
             """;
     private static final String UPDATE_SQL = """
             UPDATE answers
-            SET short_name = ?,
+            SET node_id = ?,
+                short_name = ?,
                 text = ?,
                 question_id = ?,
                 quest_id = ?,
                 type = ?,
                 next_question_id = ?
-            WHERE id = ?
+            WHERE node_id = ? AND quest_id = ?
             """;
     private static final String DELETE_SQL = """
             DELETE FROM answers
-            WHERE id = ?
+            WHERE node_id = ? and quest_id = ?
             """;
 
 
     @Override
     public Answer create(Answer entity) {
         try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(CREATE_SQL, Statement.RETURN_GENERATED_KEYS)
+             PreparedStatement preparedStatement = connection.prepareStatement(CREATE_SQL)
         ) {
-            preparedStatement.setString(1, entity.getShortName());
-            preparedStatement.setString(2, entity.getText());
-            preparedStatement.setLong(3, entity.getQuestionId());
-            preparedStatement.setLong(4, entity.getQuestId());
-            preparedStatement.setString(5, entity.getType().name());
-            preparedStatement.setLong(6, entity.getNextQuestionId());
+            preparedStatement.setLong(1, entity.getNodeId());
+            preparedStatement.setString(2, entity.getShortName());
+            preparedStatement.setString(3, entity.getText());
+            preparedStatement.setLong(4, entity.getQuestionId());
+            preparedStatement.setLong(5, entity.getQuestId());
+            preparedStatement.setString(6, entity.getType().name());
+            preparedStatement.setLong(7, entity.getNextQuestionId());
             preparedStatement.execute();
-            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            generatedKeys.next();
-            entity.setId(generatedKeys.getLong("id"));
             return entity;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -67,7 +66,7 @@ public enum AnswerRepository implements Repository<Answer> {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Answer answer = Answer.builder()
-                        .id(resultSet.getLong("id"))
+                        .nodeId(resultSet.getLong("node_id"))
                         .shortName(resultSet.getString("short_name"))
                         .text(resultSet.getString("text"))
                         .questionId(resultSet.getLong("question_id"))
@@ -84,10 +83,11 @@ public enum AnswerRepository implements Repository<Answer> {
     }
 
     @Override
-    public Optional<Answer> get(Long id) {
+    public Optional<Answer> get(Long nodeId, Long questId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_SQL)) {
-            preparedStatement.setLong(1, id);
+            preparedStatement.setLong(1, nodeId);
+            preparedStatement.setLong(2, questId);
             Answer answer = getAnswer(preparedStatement);
             return Optional.ofNullable(answer);
         } catch (SQLException e) {
@@ -100,7 +100,7 @@ public enum AnswerRepository implements Repository<Answer> {
         Answer answer = null;
         if (resultSet.next()) {
             answer = Answer.builder()
-                    .id(resultSet.getLong("id"))
+                    .nodeId(resultSet.getLong("id"))
                     .shortName(resultSet.getString("short_name"))
                     .text(resultSet.getString("text"))
                     .questionId(resultSet.getLong("question_id"))
@@ -116,12 +116,13 @@ public enum AnswerRepository implements Repository<Answer> {
     public boolean update(Answer entity) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
-            preparedStatement.setString(1, entity.getShortName());
-            preparedStatement.setString(2, entity.getText());
-            preparedStatement.setLong(3, entity.getQuestionId());
-            preparedStatement.setLong(4, entity.getQuestId());
-            preparedStatement.setString(5, entity.getType().name());
-            preparedStatement.setLong(6, entity.getNextQuestionId());
+            preparedStatement.setLong(1, entity.getNodeId());
+            preparedStatement.setString(2, entity.getShortName());
+            preparedStatement.setString(3, entity.getText());
+            preparedStatement.setLong(4, entity.getQuestionId());
+            preparedStatement.setLong(5, entity.getQuestId());
+            preparedStatement.setString(6, entity.getType().name());
+            preparedStatement.setLong(7, entity.getNextQuestionId());
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -129,10 +130,11 @@ public enum AnswerRepository implements Repository<Answer> {
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(Long nodeId, Long questId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_SQL)) {
-            preparedStatement.setLong(1, id);
+            preparedStatement.setLong(1, nodeId);
+            preparedStatement.setLong(2, questId);
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new QException(e);
@@ -141,7 +143,7 @@ public enum AnswerRepository implements Repository<Answer> {
 
     @Override
     public boolean delete(Answer entity) {
-        return delete(entity.getId());
+        return delete(entity.getNodeId(), entity.getQuestId());
     }
 }
 

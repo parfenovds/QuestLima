@@ -11,44 +11,43 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public enum QuestionRepository implements Repository<Question> {
+public enum QuestionRepository implements TwoPrimaryKeyRepository<Question> {
     INSTANCE;
     private static final String CREATE_SQL = """
-            INSERT INTO questions (short_name, text, quest_id, type) VALUES (?, ?, ?, ?)
+            INSERT INTO questions (node_id, short_name, text, quest_id, type) VALUES (?, ?, ?, ?, ?)
             """;
     private static final String FIND_ALL_SQL = """
-            SELECT id, short_name, text, quest_id, type FROM questions
+            SELECT node_id, short_name, text, quest_id, type FROM questions
             """;
     private static final String FIND_SQL = FIND_ALL_SQL + """
-            WHERE id = ?
+            WHERE node_id = ? AND quest_id = ?
             """;
     private static final String UPDATE_SQL = """
             UPDATE questions
-            SET short_name = ?,
+            SET node_id = ?,
+                short_name = ?,
                 text = ?,
                 quest_id = ?,
                 type = ?
-            WHERE id = ?
+            WHERE node_id = ? AND quest_id = ?
             """;
     private static final String DELETE_SQL = """
             DELETE FROM questions
-            WHERE id = ?
+            WHERE node_id = ? AND quest_id = ?
             """;
 
 
     @Override
     public Question create(Question entity) {
         try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(CREATE_SQL, Statement.RETURN_GENERATED_KEYS)
+             PreparedStatement preparedStatement = connection.prepareStatement(CREATE_SQL)
         ) {
-            preparedStatement.setString(1, entity.getShortName());
-            preparedStatement.setString(2, entity.getText());
-            preparedStatement.setLong(3, entity.getQuestId());
-            preparedStatement.setString(4, entity.getType().name());
+            preparedStatement.setLong(1, entity.getNodeId());
+            preparedStatement.setString(2, entity.getShortName());
+            preparedStatement.setString(3, entity.getText());
+            preparedStatement.setLong(4, entity.getQuestId());
+            preparedStatement.setString(5, entity.getType().name());
             preparedStatement.execute();
-            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
-            generatedKeys.next();
-            entity.setId(generatedKeys.getLong("id"));
             return entity;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -63,7 +62,7 @@ public enum QuestionRepository implements Repository<Question> {
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Question question = Question.builder()
-                        .id(resultSet.getLong("id"))
+                        .nodeId(resultSet.getLong("node_id"))
                         .shortName(resultSet.getString("short_name"))
                         .text(resultSet.getString("text"))
                         .questId(resultSet.getLong("quest_id"))
@@ -78,10 +77,11 @@ public enum QuestionRepository implements Repository<Question> {
     }
 
     @Override
-    public Optional<Question> get(Long id) {
+    public Optional<Question> get(Long nodeId, Long questId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_SQL)) {
-            preparedStatement.setLong(1, id);
+            preparedStatement.setLong(1, nodeId);
+            preparedStatement.setLong(2, questId);
             Question question = getQuestion(preparedStatement);
             return Optional.ofNullable(question);
         } catch (SQLException e) {
@@ -94,7 +94,7 @@ public enum QuestionRepository implements Repository<Question> {
         Question question = null;
         if (resultSet.next()) {
             question = Question.builder()
-                    .id(resultSet.getLong("id"))
+                    .nodeId(resultSet.getLong("node_id"))
                     .shortName(resultSet.getString("short_name"))
                     .text(resultSet.getString("text"))
                     .questId(resultSet.getLong("quest_id"))
@@ -108,10 +108,11 @@ public enum QuestionRepository implements Repository<Question> {
     public boolean update(Question entity) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
-            preparedStatement.setString(1, entity.getShortName());
-            preparedStatement.setString(2, entity.getText());
-            preparedStatement.setLong(3, entity.getQuestId());
-            preparedStatement.setString(4, entity.getType().name());
+            preparedStatement.setLong(1, entity.getQuestId());
+            preparedStatement.setString(2, entity.getShortName());
+            preparedStatement.setString(3, entity.getText());
+            preparedStatement.setLong(4, entity.getQuestId());
+            preparedStatement.setString(5, entity.getType().name());
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -119,10 +120,11 @@ public enum QuestionRepository implements Repository<Question> {
     }
 
     @Override
-    public boolean delete(Long id) {
+    public boolean delete(Long nodeId, Long questId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_SQL)) {
-            preparedStatement.setLong(1, id);
+            preparedStatement.setLong(1, nodeId);
+            preparedStatement.setLong(2, questId);
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new QException(e);
@@ -131,7 +133,7 @@ public enum QuestionRepository implements Repository<Question> {
 
     @Override
     public boolean delete(Question entity) {
-        return delete(entity.getId());
+        return delete(entity.getNodeId(), entity.getQuestId());
     }
 }
 

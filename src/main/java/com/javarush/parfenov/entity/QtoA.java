@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class QtoA {
+    private Long questId;
     private Long parentNodeId;
     private Long childNodeId;
 }

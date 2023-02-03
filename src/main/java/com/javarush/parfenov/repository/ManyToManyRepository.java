@@ -6,10 +6,10 @@ import java.util.Optional;
 public interface ManyToManyRepository<T> {
     T create(T entity);
     Collection<T> getAll();
-    Collection<T> getApproptiate(Long parentId);
-    Optional<T> get(Long parentId, Long childId);
+    Collection<T> getApproptiate(Long questId, Long parentId);
+    Optional<T> get(Long questId, Long parentId, Long childId);
     boolean update(T entity);
-    boolean delete(Long parentId, Long childId);
+    boolean delete(Long questId, Long parentId, Long childId);
     boolean delete(T entity);
 
 

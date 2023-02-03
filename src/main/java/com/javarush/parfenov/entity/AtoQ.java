@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class AtoQ {
+    private Long questId;
     private Long parentNodeId;
     private Long childNodeId;
 }
