@@ -80,7 +80,7 @@ public enum ParentToChildRepository implements ManyToManyRepository<ParentToChil
     }
 
     @Override
-    public Collection<ParentToChild> getApproptiate(Long questId, Long parentId) {
+    public List<ParentToChild> getApproptiate(Long questId, Long parentId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_APPROPRIATE_SQL)) {
             preparedStatement.setLong(1, questId);

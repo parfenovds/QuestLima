@@ -10,9 +10,10 @@
 <body>
 <ul id="nav">
   <li><a href="/">Home</a></li>
-  <li><a href="quests" >Quests</a></li>
-  <c:if test="${sessionScope.user != null}">
+  <li><a href="quests" >Your quests</a></li>
+  <li><a href="menu_of_quests" >All quests</a></li>
 
+  <c:if test="${sessionScope.user != null}">
     <li><a href="logout">Logout for ${sessionScope.user.login}</a></li>
   </c:if>
   <c:if test="${sessionScope.user == null}">

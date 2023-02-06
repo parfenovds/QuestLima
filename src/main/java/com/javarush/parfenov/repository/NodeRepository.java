@@ -96,7 +96,7 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
         }
     }
 
-    public Collection<Node> getByParentId(Long parentId, Long questId) {
+    public List<Node> getByParentId(Long parentId, Long questId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_PARENT_ID_AND_QUEST_ID_SQL)) {
             preparedStatement.setLong(1, parentId);
