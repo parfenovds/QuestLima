@@ -1,5 +1,6 @@
 package com.javarush.parfenov.util;
 
+import com.javarush.parfenov.dto.UserDto;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,6 +17,14 @@ public class JSP {
             requestDispatcher.forward(request, response);
         } catch (ServletException | IOException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static void forwardToPathIfLoggedIn(HttpServletRequest request, HttpServletResponse response, UserDto user, String path) {
+        if(user != null) {
+            forward(request, response, path);
+        } else {
+            forward(request, response, "login");
         }
     }
 }

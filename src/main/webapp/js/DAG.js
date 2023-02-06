@@ -3,8 +3,12 @@ const selectedRadius = 8;
 const allowedOptionsForSelect = new Map();
 const parentToAllowedOptionsForSelect = new Map();
 let questId = d3.select('.tt').attr('id');
+let newQuestId = d3.select('.newQuestId').attr('id');
+if(newQuestId == null) newQuestId = questId;
+// let addr = 'JSON/flare.json';
+let addr = (Number(questId) === -1) ? 'JSON/basic.json' : 'returnJson';
 
-treeJSON = d3.json("JSON/test.json", function (error, treeData) {
+treeJSON = d3.json(addr, function (error, treeData) {
 
     allowedOptionsForSelect.set('init', []);
     allowedOptionsForSelect.set('win', ['fail', 'question']);
@@ -42,10 +46,11 @@ treeJSON = d3.json("JSON/test.json", function (error, treeData) {
     let counter;
     let counterSet = false;
     let lastParentToCut = null;
+    let changesSaved = false;
 
     // size of the diagram
     var viewerWidth = $(document).width() - widthOfRightPanel;
-    var viewerHeight = $(document).height() * 0.95;
+    var viewerHeight = $(document).height() * 0.9;
 
     var tree = d3.layout.tree()
         .size([viewerHeight, viewerWidth]);
@@ -117,6 +122,7 @@ treeJSON = d3.json("JSON/test.json", function (error, treeData) {
         let result = await response;
         console.log("second");
         alert(result.status);
+        window.onbeforeunload = null;
     }
 
     d3.select("#rightDiv")
@@ -290,6 +296,7 @@ treeJSON = d3.json("JSON/test.json", function (error, treeData) {
             }
             lastSelectedNodeData.children.push({
                 'node_id': currentId.toString(),
+                'quest_id': newQuestId,
                 'name': str,
                 'text': "put your text here",
                 'type': str,
@@ -844,6 +851,9 @@ treeJSON = d3.json("JSON/test.json", function (error, treeData) {
         // Compute the new height, function counts total children of root node and sets tree height accordingly.
         // This prevents the layout looking squashed when new nodes are made visible or looking sparse when nodes are removed
         // This makes the layout more consistent.
+        window.onbeforeunload = function () {
+            return 'You have unsaved changes!';
+        }
         var levelWidth = [1];
         var childCount = function (level, n) {
 
@@ -975,6 +985,11 @@ treeJSON = d3.json("JSON/test.json", function (error, treeData) {
                 return d === lastSelectedNodeData ? selectedRadius : 4.5
             })
             .style("fill", function (d) {
+                if(d.quest_id == -1 || d.quest_id == null) {
+                    d.quest_id = newQuestId;
+                } else {
+                    newQuestId = d.quest_id;
+                }
                 if (d.type === "init") return "black";
                 else if (d.type === "win") return "#258039";
                 else if (d.type === "fail") return "#CF3721";
@@ -1173,6 +1188,7 @@ treeJSON = d3.json("JSON/test.json", function (error, treeData) {
     centerNode(root);
 
 
+
     function getJson() {
         console.log(root); //root contains everything you need
         const getCircularReplacer = (deletePorperties) => { //func that allows a circular json to be stringified
@@ -1205,5 +1221,7 @@ treeJSON = d3.json("JSON/test.json", function (error, treeData) {
     }
 
 
-});
+})
+    .header("Content-Type","application/json")
+    .send("POST", JSON.stringify({questId: questId}));
 

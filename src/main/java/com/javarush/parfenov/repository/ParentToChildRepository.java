@@ -36,6 +36,10 @@ public enum ParentToChildRepository implements ManyToManyRepository<ParentToChil
             DELETE FROM q_to_a_additional_links
             WHERE quest_id = ? AND parent_node_id = ? AND child_node_id = ?
             """;
+    private static final String DELETE_BY_QUEST_SQL = """
+            DELETE FROM q_to_a_additional_links
+            WHERE quest_id = ?
+            """;
 
 
     @Override
@@ -153,5 +157,15 @@ public enum ParentToChildRepository implements ManyToManyRepository<ParentToChil
     @Override
     public boolean delete(ParentToChild entity) {
         return delete(entity.getQuestId(), entity.getParentNodeId(), entity.getChildNodeId());
+    }
+
+    public boolean deleteByQuest(long questId) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_QUEST_SQL)) {
+            preparedStatement.setLong(1, questId);
+            return preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new QException(e);
+        }
     }
 }

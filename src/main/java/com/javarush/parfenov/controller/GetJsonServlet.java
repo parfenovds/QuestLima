@@ -1,5 +1,6 @@
 package com.javarush.parfenov.controller;
 
+import com.javarush.parfenov.repository.NodeRepository;
 import com.javarush.parfenov.service.QuestObjectsService;
 import com.javarush.parfenov.util.JSP;
 import jakarta.servlet.*;
@@ -26,6 +27,8 @@ public class GetJsonServlet extends HttpServlet {
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }
+            request.getSession().getAttribute("user.login");
+
             questObjectsService.jsonParse(sb.toString());
             JSP.forward(request, response, "quests");
 

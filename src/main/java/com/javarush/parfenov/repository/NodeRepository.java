@@ -46,6 +46,11 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
             WHERE node_id = ? AND quest_id = ?
             """;
 
+    private static final String DELETE_BY_QUEST_SQL = """
+            DELETE FROM nodes
+            WHERE quest_id = ?
+            """;
+
 
     @Override
     public Node create(Node entity) {
@@ -62,6 +67,7 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
             preparedStatement.execute();
             return entity;
         } catch (SQLException e) {
+            e.printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -183,6 +189,16 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
              PreparedStatement preparedStatement = connection.prepareStatement(DELETE_SQL)) {
             preparedStatement.setLong(1, nodeId);
             preparedStatement.setLong(2, questId);
+            return preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new QException(e);
+        }
+    }
+
+    public boolean deleteByQuest(Long questId) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_BY_QUEST_SQL)) {
+            preparedStatement.setLong(1, questId);
             return preparedStatement.executeUpdate() > 0;
         } catch (SQLException e) {
             throw new QException(e);

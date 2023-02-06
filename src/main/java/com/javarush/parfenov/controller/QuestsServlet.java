@@ -17,14 +17,12 @@ public class QuestsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
-        UserDto user = (UserDto) session.getAttribute("user");
-        if(user != null) {
-//            session.setAttribute("quests", QUEST_SERVICE.getQuestDtoByUserLogin(user.getLogin()));
-            JSP.forward(request, response, "quests");
-        } else {
-            JSP.forward(request, response, "login");
-        }
+        UserDto userDto = (UserDto) session.getAttribute("user");
+        session.setAttribute("quests", QUEST_SERVICE.getQuestDtoByUserLogin(userDto.getLogin()));
+        JSP.forwardToPathIfLoggedIn(request, response, userDto, "quests");
     }
+
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

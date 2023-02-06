@@ -42,6 +42,7 @@ public enum JsonPrepareService {
                 .put("name", sourceNode.getShortName())
                 .put("text", sourceNode.getText())
                 .put("type", sourceNode.getType().name().toLowerCase())
+                .put("quest_id", questId)
                 .put("node_parent", String.valueOf(sourceNode.getParentId()))
                 .put("lonely_child", String.valueOf(sourceNode.getNextLonelyId()));
         addAdditionalLinks(factory, questId, targetJNode, nodeId);

@@ -13,12 +13,14 @@ public enum QuestObjectsService {
     INSTANCE;
     private static final NodeRepository NODE_REPOSITORY = NodeRepository.INSTANCE;
     private static final ParentToChildRepository PARENT_TO_CHILD_REPOSITORY = ParentToChildRepository.INSTANCE;
-    private static final Long QUEST_ID = 1L;
 
     @SneakyThrows
     public void jsonParse(String json) {
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(json);
+        long questId = root.get("quest_id").asLong();
+        NODE_REPOSITORY.deleteByQuest(questId);
+        PARENT_TO_CHILD_REPOSITORY.deleteByQuest(questId);
         treeConverter(root);
     }
 
@@ -36,7 +38,7 @@ public enum QuestObjectsService {
                 .shortName(node.get("name").asText())
                 .parentId(node.get("node_parent").asLong())
                 .text(node.get("text").asText())
-                .questId(QUEST_ID)
+                .questId(node.get("quest_id").asLong())
                 .type(NodeType.valueOf(node.get("type").asText().toUpperCase()))
                 .nextLonelyId(node.get("lonely_child").asLong())
                 .build();
@@ -64,20 +66,19 @@ public enum QuestObjectsService {
 
     private void addAdditionalLinks(JsonNode node) {
         if (node.has("additional_linked_nodes")) {
-            System.out.println("HOOOO");
             long nodeId = node.get("node_id").asLong();
             JsonNode additionalLinkedNodes = node.get("additional_linked_nodes");
             if (!additionalLinkedNodes.isEmpty()) {
                 for (JsonNode linkedNode : additionalLinkedNodes) {
-                    putParentToChild(nodeId, linkedNode);
+                    putParentToChild(nodeId, linkedNode, node.get("quest_id").asLong());
                 }
             }
         }
     }
 
-    private void putParentToChild(long nodeId, JsonNode linkedNode) {
+    private void putParentToChild(long nodeId, JsonNode linkedNode, Long questId) {
         ParentToChild parentToChild = ParentToChild.builder()
-                .questId(QUEST_ID)
+                .questId(questId)
                 .parentNodeId(nodeId)
                 .childNodeId(linkedNode.get("node_id").asLong())
                 .build();

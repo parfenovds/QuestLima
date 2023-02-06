@@ -2,7 +2,7 @@ package com.javarush.parfenov.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javarush.parfenov.service.JsonPrepareService;
+import com.javarush.parfenov.service.QuestService;
 import com.javarush.parfenov.util.JSP;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -10,12 +10,10 @@ import jakarta.servlet.annotation.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 
-@WebServlet(name = "SendJsonServlet", value = "/returnJson")
-public class SendJsonServlet extends HttpServlet {
-
-    private final JsonPrepareService jsonPrepareService = JsonPrepareService.INSTANCE;
+@WebServlet(name = "RemoveQuestServlet", value = "/removeQuest")
+public class RemoveQuestServlet extends HttpServlet {
+    private static final QuestService questService = QuestService.INSTANCE;
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -33,11 +31,11 @@ public class SendJsonServlet extends HttpServlet {
             ObjectMapper mapper = new ObjectMapper();
             JsonNode root = mapper.readTree(sb.toString());
             long questId = root.get("questId").asLong();
-            response.setContentType("application/json");
-            PrintWriter out = response.getWriter();
-            out.print(jsonPrepareService.getJson(questId));
-            out.flush();
-//            JSP.forward(request, response, "quest_creator");
+
+            questService.delete(questId);
+
+            JSP.forward(request, response, "quests");
+//            response.sendRedirect(request.getContextPath() + "quest_creator.jsp");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

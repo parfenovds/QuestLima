@@ -10,9 +10,9 @@
 <body>
 <ul id="nav">
   <li><a href="/">Home</a></li>
-  <li><a href="quests">Quests</a></li>
-  <li><a href="quest_creator">Quest Creator</a></li>
+  <li><a href="quests" >Quests</a></li>
   <c:if test="${sessionScope.user != null}">
+
     <li><a href="logout">Logout for ${sessionScope.user.login}</a></li>
   </c:if>
   <c:if test="${sessionScope.user == null}">
@@ -20,3 +20,28 @@
     <li><a href="registration">Registration</a></li>
   </c:if>
 </ul>
+<script>
+  async function questPost(questId, url) {
+    let quest = {
+      questId
+    };
+
+    let response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      body: JSON.stringify(quest)
+    });
+    window.location='quest_creator';
+
+    // let result = response.status;
+    // alert(result);
+  }
+</script>
+<script>
+  function questsPlusReloadPage() {
+    window.location='quests';
+    window.location.reload();
+  }
+</script>
