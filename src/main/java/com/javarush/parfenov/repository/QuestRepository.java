@@ -6,7 +6,6 @@ import com.javarush.parfenov.util.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,45 +58,38 @@ public enum QuestRepository implements Repository<Quest> {
     }
 
     @Override
-    public Collection<Quest> getAll() {
+    public List<Quest> getAll() {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
-            List<Quest> result = new ArrayList<>();
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Quest quest = Quest.builder()
-                        .id(resultSet.getLong("id"))
-                        .userId(resultSet.getLong("user_id"))
-                        .text(resultSet.getString("text"))
-                        .name(resultSet.getString("name"))
-                        .build();
-                result.add(quest);
-            }
-            return result;
+            return getQuests(preparedStatement);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public Collection<Quest> getByUserLogin(String login) {
+    public List<Quest> getByUserLogin(String login) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_USER_LOGIN_SQL)) {
             preparedStatement.setString(1, login);
-            List<Quest> result = new ArrayList<>();
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Quest quest = Quest.builder()
-                        .id(resultSet.getLong("id"))
-                        .userId(resultSet.getLong("user_id"))
-                        .text(resultSet.getString("text"))
-                        .name(resultSet.getString("name"))
-                        .build();
-                result.add(quest);
-            }
-            return result;
+            return getQuests(preparedStatement);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<Quest> getQuests(PreparedStatement preparedStatement) throws SQLException {
+        List<Quest> result = new ArrayList<>();
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            Quest quest = Quest.builder()
+                    .id(resultSet.getLong("id"))
+                    .userId(resultSet.getLong("user_id"))
+                    .text(resultSet.getString("text"))
+                    .name(resultSet.getString("name"))
+                    .build();
+            result.add(quest);
+        }
+        return result;
     }
 
     @Override

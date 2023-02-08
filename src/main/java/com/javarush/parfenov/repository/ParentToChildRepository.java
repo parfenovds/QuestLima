@@ -6,7 +6,6 @@ import com.javarush.parfenov.util.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,45 +59,38 @@ public enum ParentToChildRepository implements ManyToManyRepository<ParentToChil
     }
 
     @Override
-    public Collection<ParentToChild> getAll() {
+    public List<ParentToChild> getAll() {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
-            List<ParentToChild> result = new ArrayList<>();
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                ParentToChild parentToChild = ParentToChild.builder()
-                        .questId(resultSet.getLong("quest_id"))
-                        .parentNodeId(resultSet.getLong("parent_node_id"))
-                        .childNodeId(resultSet.getLong("child_node_id"))
-                        .build();
-                result.add(parentToChild);
-            }
-            return result;
+            return getParentToChildren(preparedStatement);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
     public List<ParentToChild> getApproptiate(Long questId, Long parentId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_APPROPRIATE_SQL)) {
             preparedStatement.setLong(1, questId);
             preparedStatement.setLong(2, parentId);
-            List<ParentToChild> result = new ArrayList<>();
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                ParentToChild parentToChild = ParentToChild.builder()
-                        .questId(resultSet.getLong("quest_id"))
-                        .parentNodeId(resultSet.getLong("parent_node_id"))
-                        .childNodeId(resultSet.getLong("child_node_id"))
-                        .build();
-                result.add(parentToChild);
-            }
-            return result;
+            return getParentToChildren(preparedStatement);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private List<ParentToChild> getParentToChildren(PreparedStatement preparedStatement) throws SQLException {
+        List<ParentToChild> result = new ArrayList<>();
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            ParentToChild parentToChild = ParentToChild.builder()
+                    .questId(resultSet.getLong("quest_id"))
+                    .parentNodeId(resultSet.getLong("parent_node_id"))
+                    .childNodeId(resultSet.getLong("child_node_id"))
+                    .build();
+            result.add(parentToChild);
+        }
+        return result;
     }
 
     @Override

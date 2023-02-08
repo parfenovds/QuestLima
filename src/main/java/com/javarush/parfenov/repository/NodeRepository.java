@@ -7,7 +7,6 @@ import com.javarush.parfenov.util.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,13 +56,7 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(CREATE_SQL)
         ) {
-            preparedStatement.setLong(1, entity.getNodeId());
-            preparedStatement.setString(2, entity.getShortName());
-            preparedStatement.setString(3, entity.getText());
-            preparedStatement.setLong(4, entity.getParentId());
-            preparedStatement.setLong(5, entity.getQuestId());
-            preparedStatement.setString(6, entity.getType().name());
-            preparedStatement.setLong(7, entity.getNextLonelyId());
+            prepareStatement(entity, preparedStatement);
             preparedStatement.execute();
             return entity;
         } catch (SQLException e) {
@@ -73,24 +66,31 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
     }
 
     @Override
-    public Collection<Node> getAll() {
+    public boolean update(Node entity) {
+        try (Connection connection = ConnectionManager.get();
+             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
+            prepareStatement(entity, preparedStatement);
+            return preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void prepareStatement(Node entity, PreparedStatement preparedStatement) throws SQLException {
+        preparedStatement.setLong(1, entity.getNodeId());
+        preparedStatement.setString(2, entity.getShortName());
+        preparedStatement.setString(3, entity.getText());
+        preparedStatement.setLong(4, entity.getParentId());
+        preparedStatement.setLong(5, entity.getQuestId());
+        preparedStatement.setString(6, entity.getType().name());
+        preparedStatement.setLong(7, entity.getNextLonelyId());
+    }
+
+    @Override
+    public List<Node> getAll() {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_ALL_SQL)) {
-            List<Node> result = new ArrayList<>();
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Node node = Node.builder()
-                        .nodeId(resultSet.getLong("node_id"))
-                        .shortName(resultSet.getString("short_name"))
-                        .text(resultSet.getString("text"))
-                        .parentId(resultSet.getLong("parent_id"))
-                        .questId(resultSet.getLong("quest_id"))
-                        .type(NodeType.valueOf(resultSet.getString("type")))
-                        .nextLonelyId(resultSet.getLong("next_lonely_id"))
-                        .build();
-                result.add(node);
-            }
-            return result;
+            return prepareNodes(preparedStatement);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -101,27 +101,30 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_PARENT_ID_AND_QUEST_ID_SQL)) {
             preparedStatement.setLong(1, parentId);
             preparedStatement.setLong(2, questId);
-            List<Node> result = new ArrayList<>();
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Node node = Node.builder()
-                        .nodeId(resultSet.getLong("node_id"))
-                        .shortName(resultSet.getString("short_name"))
-                        .text(resultSet.getString("text"))
-                        .parentId(resultSet.getLong("parent_id"))
-                        .questId(resultSet.getLong("quest_id"))
-                        .type(NodeType.valueOf(resultSet.getString("type")))
-                        .nextLonelyId(resultSet.getLong("next_lonely_id"))
-                        .build();
-                result.add(node);
-            }
-            return result;
+            return prepareNodes(preparedStatement);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-        @Override
+    private List<Node> prepareNodes(PreparedStatement preparedStatement) throws SQLException {
+        List<Node> result = new ArrayList<>();
+        ResultSet resultSet = preparedStatement.executeQuery();
+        while (resultSet.next()) {
+            Node node = Node.builder()
+                    .nodeId(resultSet.getLong("node_id"))
+                    .shortName(resultSet.getString("short_name"))
+                    .text(resultSet.getString("text"))
+                    .parentId(resultSet.getLong("parent_id"))
+                    .questId(resultSet.getLong("quest_id"))
+                    .type(NodeType.valueOf(resultSet.getString("type")))
+                    .nextLonelyId(resultSet.getLong("next_lonely_id"))
+                    .build();
+            result.add(node);
+        }
+        return result;
+    }
+    @Override
     public Optional<Node> get(Long nodeId, Long questId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_SQL)) {
@@ -134,7 +137,8 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
         }
     }
 
-//TODO: it should return collection!!!
+    //TODO: it should return collection!!!
+
     public Optional<Node> getByType(NodeType nodeType, Long questId) {
         try (Connection connection = ConnectionManager.get();
              PreparedStatement preparedStatement = connection.prepareStatement(FIND_BY_TYPE_AND_QUEST_ID_SQL)) {
@@ -146,7 +150,6 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
             throw new RuntimeException(e);
         }
     }
-
 
 
     private static Node getNode(PreparedStatement preparedStatement) throws SQLException {
@@ -164,23 +167,6 @@ public enum NodeRepository implements TwoPrimaryKeyRepository<Node> {
                     .build();
         }
         return node;
-    }
-
-    @Override
-    public boolean update(Node entity) {
-        try (Connection connection = ConnectionManager.get();
-             PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_SQL)) {
-            preparedStatement.setLong(1, entity.getQuestId());
-            preparedStatement.setString(2, entity.getShortName());
-            preparedStatement.setString(3, entity.getText());
-            preparedStatement.setLong(4, entity.getParentId());
-            preparedStatement.setLong(5, entity.getQuestId());
-            preparedStatement.setString(6, entity.getType().name());
-            preparedStatement.setLong(7, entity.getNextLonelyId());
-            return preparedStatement.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override

@@ -15,7 +15,7 @@ public class GetJsonServlet extends HttpServlet {
     private static final QuestObjectsService questObjectsService = QuestObjectsService.INSTANCE;
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-//        JSP.forward(request, response, "quests");
+
     }
 
     @Override
@@ -28,12 +28,8 @@ public class GetJsonServlet extends HttpServlet {
                 sb.append(line);
             }
             request.getSession().getAttribute("user.login");
-
             questObjectsService.jsonParse(sb.toString());
             JSP.forward(request, response, "quests");
-
-
-
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

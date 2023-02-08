@@ -2,8 +2,9 @@ package com.javarush.parfenov.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.javarush.parfenov.repository.NodeRepository;
+import com.javarush.parfenov.repository.ParentToChildRepository;
 import com.javarush.parfenov.service.JsonPrepareService;
-import com.javarush.parfenov.util.JSP;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
@@ -16,6 +17,8 @@ import java.io.PrintWriter;
 public class SendJsonServlet extends HttpServlet {
 
     private final JsonPrepareService jsonPrepareService = JsonPrepareService.INSTANCE;
+//    private final NodeRepository nodeRepository = NodeRepository.INSTANCE;
+//    private final ParentToChildRepository parentToChildRepository = ParentToChildRepository.INSTANCE;
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -37,7 +40,6 @@ public class SendJsonServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
             out.print(jsonPrepareService.getJson(questId));
             out.flush();
-//            JSP.forward(request, response, "quest_creator");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

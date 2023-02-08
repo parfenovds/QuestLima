@@ -24,18 +24,18 @@ treeJSON = d3.json(addr, function (error, treeData) {
     parentToAllowedOptionsForSelect.set('question', ['answer']);
 
     // Calculate total nodes, max label length
-    var totalNodes = 0;
-    var maxLabelLength = 0;
+    let totalNodes = 0;
+    let maxLabelLength = 0;
     // variables for drag/drop
-    var selectedNode = null;
-    var draggingNode = null;
+    let selectedNode = null;
+    let draggingNode = null;
     // panning variables
-    var panSpeed = 200;
-    var panBoundary = 20; // Within 20px from edges will pan when dragging.
+    let panSpeed = 200;
+    let panBoundary = 20; // Within 20px from edges will pan when dragging.
     // Misc. variables
-    var i = 0;
-    var duration = 750;
-    var root;
+    let i = 0;
+    let duration = 750;
+    let root;
     let lastSelectedNodeData = null;
     let lastSelectedNode = null;
     let lastSelectedLink = null;
@@ -49,14 +49,14 @@ treeJSON = d3.json(addr, function (error, treeData) {
     let changesSaved = false;
 
     // size of the diagram
-    var viewerWidth = $(document).width() - widthOfRightPanel;
-    var viewerHeight = $(document).height() * 0.9;
+    let viewerWidth = $(document).width() - widthOfRightPanel;
+    let viewerHeight = $(document).height() * 0.9;
 
-    var tree = d3.layout.tree()
+    let tree = d3.layout.tree()
         .size([viewerHeight, viewerWidth]);
 
     // define a d3 diagonal projection for use by the node paths later on.
-    var diagonal = d3.svg.diagonal()
+    let diagonal = d3.svg.diagonal()
         .projection(function (d) {
             return [d.y, d.x];
         });
@@ -108,8 +108,8 @@ treeJSON = d3.json(addr, function (error, treeData) {
             };
         };
 
-        var myRoot = JSON.stringify(root, getCircularReplacer(false)); //Stringify a first time to clone the root object (it's allow you to delete properties you don't want to save)
-        var myvar = JSON.parse(myRoot);
+        let myRoot = JSON.stringify(root, getCircularReplacer(false)); //Stringify a first time to clone the root object (it's allow you to delete properties you don't want to save)
+        let myvar = JSON.parse(myRoot);
         myvar = JSON.stringify(myvar, getCircularReplacer(true));
         let response = await fetch('/getJson', {
             method: 'POST',
@@ -362,10 +362,10 @@ treeJSON = d3.json(addr, function (error, treeData) {
 
         visitFn(parent);
 
-        var children = childrenFn(parent);
+        let children = childrenFn(parent);
         if (children) {
-            var count = children.length;
-            for (var i = 0; i < count; i++) {
+            let count = children.length;
+            for (let i = 0; i < count; i++) {
                 visit(children[i], visitFn, childrenFn);
             }
         }
@@ -395,7 +395,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
     // TODO: Pan function, can be better implemented.
 
     function pan(domNode, direction) {
-        var speed = panSpeed;
+        let speed = panSpeed;
         if (panTimer) {
             clearTimeout(panTimer);
             translateCoords = d3.transform(svgGroup.attr("transform"));
@@ -427,7 +427,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
 
 
     // define the zoomListener which calls the zoom function on the "zoom" event constrained within the scaleExtents
-    var zoomListener = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
+    let zoomListener = d3.behavior.zoom().scaleExtent([0.1, 3]).on("zoom", zoom);
 
     function constraintChooser(potentialParent, draggingNode) {
         console.log(potentialParent.node().__data__);
@@ -507,7 +507,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
     }
 
     // define the baseSvg, attaching a class for styling and the zoomListener
-    var baseSvg = d3.select("#tree-container").append("svg")
+    let baseSvg = d3.select("#tree-container").append("svg")
         .attr("width", viewerWidth)
         .attr("height", viewerHeight)
         .attr("class", "overlay")
@@ -559,7 +559,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
 
             d.x0 += d3.event.dy;
             d.y0 += d3.event.dx;
-            var node = d3.select(this);
+            let node = d3.select(this);
             node.attr("transform", "translate(" + d.y0 + "," + d.x0 + ")");
             updateTempConnector();
         }).on("dragend", function (d) {
@@ -569,7 +569,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
             domNode = this;
             if (selectedNode && checkPossibilityOfTransition(selectedNode, draggingNode)) {
                 // now remove the element from the parent, and insert it into the new elements children
-                var index = draggingNode.parent.children.indexOf(draggingNode);
+                let index = draggingNode.parent.children.indexOf(draggingNode);
                 if (index > -1) {
                     draggingNode.parent.children.splice(index, 1);
                 }
@@ -636,18 +636,18 @@ treeJSON = d3.json(addr, function (error, treeData) {
         }
     }
 
-    var overCircle = function (d) {
+    let overCircle = function (d) {
         selectedNode = d;
         updateTempConnector();
     };
-    var outCircle = function (d) {
+    let outCircle = function (d) {
         selectedNode = null;
         updateTempConnector();
     };
 
     // Function to update the temporary connector indicating dragging affiliation
-    var updateTempConnector = function () {
-        var data = [];
+    let updateTempConnector = function () {
+        let data = [];
         if (draggingNode !== null && selectedNode !== null) {
             // have to flip the source coordinates since we did this for the existing connectors on the original tree
             data = [{
@@ -658,7 +658,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
                 }
             }];
         }
-        var link = svgGroup.selectAll(".templink").data(data);
+        let link = svgGroup.selectAll(".templink").data(data);
 
         link.enter().append("path")
             .attr("class", "templink")
@@ -854,8 +854,8 @@ treeJSON = d3.json(addr, function (error, treeData) {
         window.onbeforeunload = function () {
             return 'You have unsaved changes!';
         }
-        var levelWidth = [1];
-        var childCount = function (level, n) {
+        let levelWidth = [1];
+        let childCount = function (level, n) {
 
             if (n.children && n.children.length > 0) {
                 if (levelWidth.length <= level + 1) levelWidth.push(0);
@@ -867,7 +867,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
             }
         };
         childCount(0, root);
-        var newHeight = d3.max(levelWidth) * 45; // 25 pixels per line
+        let newHeight = d3.max(levelWidth) * 45; // 25 pixels per line
         tree = tree.size([newHeight, viewerWidth]);
 
         svgGroup.append("svg:defs").append("svg:marker")
@@ -893,7 +893,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
             .attr("d", "M0,-5L10,0L0,5");
 
         // Compute the new tree layout.
-        var nodes = tree.nodes(root).reverse(), links = tree.links(nodes);
+        let nodes = tree.nodes(root).reverse(), links = tree.links(nodes);
 
         // Set widths between levels based on maxLabelLength.
         nodes.forEach(function (d) {
@@ -910,7 +910,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
             });
 
         // Enter any new nodes at the parent's previous position.
-        var nodeEnter = node.enter().append("g")
+        let nodeEnter = node.enter().append("g")
             .call(dragListener)
             .attr("class", "node")
             .attr("transform", function (d) {
@@ -999,7 +999,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
             });
 
         // Transition nodes to their new position.
-        var nodeUpdate = node.transition()
+        let nodeUpdate = node.transition()
             .duration(duration)
             .attr("transform", function (d) {
                 return "translate(" + d.y + "," + d.x + ")";
@@ -1010,7 +1010,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
             .style("fill-opacity", 1);
 
         // Transition exiting nodes to the parent's new position.
-        var nodeExit = node.exit().transition()
+        let nodeExit = node.exit().transition()
             .attr("transform", function (d) {
                 d.additional_linked_nodes = null;
                 return "translate(" + source.y + "," + source.x + ")";
@@ -1025,7 +1025,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
             .style("fill-opacity", 0);
 
         // Update the links…
-        var link = svgGroup.selectAll("path.link")
+        let link = svgGroup.selectAll("path.link")
             .data(links, function (d) {
                 return d.target.id;
             });
@@ -1034,7 +1034,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
         link.enter().insert("path", "g")
             .attr("class", "link")
             .attr("d", function (d) {
-                var o = {
+                let o = {
                     x: source.x0, y: source.y0
                 };
                 return diagonal({
@@ -1053,7 +1053,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
         link.exit().transition()
             .duration(duration)
             .attr("d", function (d) {
-                var o = {
+                let o = {
                     x: source.x, y: source.y
                 };
                 return diagonal({
@@ -1114,11 +1114,11 @@ treeJSON = d3.json(addr, function (error, treeData) {
         }
         console.log(multiParents);
 
-        // var couplingParent1 = tree.nodes(root).filter(function(d) {
+        // let couplingParent1 = tree.nodes(root).filter(function(d) {
         //     return d['name'] === 'Начальная нода';
         // })[0];
         // console.log(couplingParent1);
-        // var couplingChild1 = tree.nodes(root).filter(function(d) {
+        // let couplingChild1 = tree.nodes(root).filter(function(d) {
         //     return d['name'] === 'JSONConverter';
         // })[0];
         //
@@ -1134,11 +1134,11 @@ treeJSON = d3.json(addr, function (error, treeData) {
                 .attr('src', multiPair.parent.node_id)
                 .attr('trg', multiPair.child.node_id)
                 .attr("d", function (d) {
-                    var oTarget = {
+                    let oTarget = {
                         x: multiPair.parent.x0,
                         y: multiPair.parent.y0
                     };
-                    var oSource = {
+                    let oSource = {
                         x: multiPair.child.x0,
                         y: multiPair.child.y0
                     };
@@ -1162,10 +1162,10 @@ treeJSON = d3.json(addr, function (error, treeData) {
 
     }
 
-    // var zoom = d3.behavior.zoom().translate([100,50]).scale(2);
+    // let zoom = d3.behavior.zoom().translate([100,50]).scale(2);
     // Append a group which holds all nodes and which the zoom Listener can act upon.
-    var svgGroup = baseSvg.append("g");
-    // var svgGroup = baseSvg.append("svg:svg")
+    let svgGroup = baseSvg.append("g");
+    // let svgGroup = baseSvg.append("svg:svg")
     // .attr("width", viewerWidth)
     // .attr("height", viewerHeight)
     //
@@ -1213,8 +1213,8 @@ treeJSON = d3.json(addr, function (error, treeData) {
             };
         };
 
-        var myRoot = JSON.stringify(root, getCircularReplacer(false)); //Stringify a first time to clone the root object (it's allow you to delete properties you don't want to save)
-        var myvar = JSON.parse(myRoot);
+        let myRoot = JSON.stringify(root, getCircularReplacer(false)); //Stringify a first time to clone the root object (it's allow you to delete properties you don't want to save)
+        let myvar = JSON.parse(myRoot);
         myvar = JSON.stringify(myvar, getCircularReplacer(true)); //Stringify a second time to delete the propeties you don't need
 
         console.log(myvar); //You have your json in myvar

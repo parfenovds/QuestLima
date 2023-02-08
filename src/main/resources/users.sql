@@ -1,1 +1,0 @@
-INSERT INTO users (login, password, role) VALUES ('me', 'asdf', 'ADMIN')
