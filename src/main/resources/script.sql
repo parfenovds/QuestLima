@@ -1,5 +1,4 @@
--- create sequence if not exists node_id_seq;
-create database quest;
+-- create database quest;
 
 create table if not exists node_types
 (
