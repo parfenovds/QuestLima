@@ -17,8 +17,15 @@ import java.util.List;
 
 @WebServlet(name = "NextQuestionServlet", value = "/nextQuestion")
 public class NextQuestionServlet extends HttpServlet {
-    private static final NodeService NODE_SERVICE = NodeService.INSTANCE;
-    private static final ParentToChildService PARENT_TO_CHILD_SERVICE = ParentToChildService.INSTANCE;
+    private NodeService nodeService;
+    private ParentToChildService parentToChildService;
+
+    @Override
+    public void init() throws ServletException {
+        nodeService = NodeService.INSTANCE;
+        parentToChildService = ParentToChildService.INSTANCE;
+        super.init();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -32,21 +39,21 @@ public class NextQuestionServlet extends HttpServlet {
         JsonNode root = mapper.readTree(jsonString);
         long questId = root.get("questId").asLong();
         long answerNodeId = root.get("nodeId").asLong();
-        Node answerNode = NODE_SERVICE.get(answerNodeId, questId).get();
+        Node answerNode = nodeService.get(answerNodeId, questId).get();
         Long nodeId;
         if (answerNode.getNextLonelyId() != 0L) {
             nodeId = answerNode.getNextLonelyId();
         } else {
-            List<ParentToChild> appropriate = PARENT_TO_CHILD_SERVICE.getAppropriate(questId, answerNodeId);
+            List<ParentToChild> appropriate = parentToChildService.getAppropriate(questId, answerNodeId);
             nodeId = appropriate.get(0).getChildNodeId();
         }
         HttpSession session = request.getSession();
-        Node node = NODE_SERVICE.get(nodeId, questId).get();
-        List<Node> answers = NODE_SERVICE.getByParentId(node.getNodeId(), questId);
-        List<ParentToChild> appropriate = PARENT_TO_CHILD_SERVICE.getAppropriate(questId, nodeId);
+        Node node = nodeService.get(nodeId, questId).get();
+        List<Node> answers = nodeService.getByParentId(node.getNodeId(), questId);
+        List<ParentToChild> appropriate = parentToChildService.getAppropriate(questId, nodeId);
         for (ParentToChild parentToChild : appropriate) {
             Long childNodeId = parentToChild.getChildNodeId();
-            Node node1 = NODE_SERVICE.get(childNodeId, questId).get();
+            Node node1 = nodeService.get(childNodeId, questId).get();
             answers.add(node1);
         }
         session.setAttribute("currentQuestion", node);

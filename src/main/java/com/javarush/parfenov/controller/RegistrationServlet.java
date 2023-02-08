@@ -4,6 +4,7 @@ import com.javarush.parfenov.dto.CreateUserDto;
 import com.javarush.parfenov.entity.Role;
 import com.javarush.parfenov.exception.ValidationException;
 import com.javarush.parfenov.service.UserService;
+import com.javarush.parfenov.util.ConnectionManager;
 import com.javarush.parfenov.util.JSP;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
@@ -11,12 +12,13 @@ import jakarta.servlet.annotation.*;
 
 import java.io.IOException;
 
-@WebServlet(name = "RegistrationServlet", value = "/registration")
+@WebServlet(name = "RegistrationServlet", value = "/registration", loadOnStartup = 0)
 public class RegistrationServlet extends HttpServlet {
 
-    private final UserService userService = UserService.INSTANCE;
+    private UserService userService;
     @Override
     public void init(ServletConfig config) throws ServletException {
+        userService = UserService.INSTANCE;
         config.getServletContext().setAttribute("roles", Role.values());
         super.init(config);
     }

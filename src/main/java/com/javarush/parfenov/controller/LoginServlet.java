@@ -17,12 +17,13 @@ import java.util.Optional;
 @WebServlet(name = "LoginServlet", value = "/login")
 public class LoginServlet extends HttpServlet {
 
-    private static final UserService userService = UserService.INSTANCE;
-    private static final QuestService QUEST_SERVICE = QuestService.INSTANCE;
+    private UserService userService;
+    private QuestService questService;
 
     @Override
     public void init(ServletConfig config) throws ServletException {
-        config.getServletContext().setAttribute("roles", Role.values());
+        userService = UserService.INSTANCE;
+        questService = QuestService.INSTANCE;
         super.init(config);
     }
 
@@ -41,21 +42,11 @@ public class LoginServlet extends HttpServlet {
         if (userDto.isPresent()) {
             HttpSession session = request.getSession();
             session.setAttribute("user", userDto.get());
-            session.setAttribute("quests", QUEST_SERVICE.getQuestDtoByUserLogin(userDto.get().getLogin()));
-            JSP.forward(request, response, "quests");
+            session.setAttribute("quests", questService.getQuestDtoByUserLogin(userDto.get().getLogin()));
+            response.sendRedirect("quests");
         } else {
             request.setAttribute("loginError", "login or password is incorrect");
             JSP.forward(request, response, "login");
-        }
-
-
-        try {
-            userService.getByLogin(createUserDto.getLogin());
-            JSP.forward(request, response, "login");
-        } catch (ValidationException e) {
-            request.setAttribute("errors", e.getValidationErrors());
-            JSP.forward(request, response, "registration");
-            throw new RuntimeException(e);
         }
     }
 }

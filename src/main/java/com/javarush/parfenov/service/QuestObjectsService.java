@@ -11,8 +11,8 @@ import java.util.Iterator;
 
 public enum QuestObjectsService {
     INSTANCE;
-    private static final NodeRepository NODE_REPOSITORY = NodeRepository.INSTANCE;
-    private static final ParentToChildRepository PARENT_TO_CHILD_REPOSITORY = ParentToChildRepository.INSTANCE;
+    private final NodeRepository NODE_REPOSITORY = NodeRepository.INSTANCE;
+    private final ParentToChildRepository PARENT_TO_CHILD_REPOSITORY = ParentToChildRepository.INSTANCE;
 
     @SneakyThrows
     public void jsonParse(String json) {
@@ -42,7 +42,6 @@ public enum QuestObjectsService {
                 .type(NodeType.valueOf(node.get("type").asText().toUpperCase()))
                 .nextLonelyId(node.get("lonely_child").asLong())
                 .build();
-//        System.out.println(builtNode);
         NODE_REPOSITORY.create(builtNode);
 
     }
@@ -82,7 +81,6 @@ public enum QuestObjectsService {
                 .parentNodeId(nodeId)
                 .childNodeId(linkedNode.get("node_id").asLong())
                 .build();
-//        System.out.println(parentToChild);
         PARENT_TO_CHILD_REPOSITORY.create(parentToChild);
     }
 

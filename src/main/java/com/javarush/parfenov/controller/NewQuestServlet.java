@@ -16,8 +16,16 @@ import java.util.Optional;
 
 @WebServlet(name = "NewQuestServlet", value = "/newQuest")
 public class NewQuestServlet extends HttpServlet {
-    private static final QuestService questService = QuestService.INSTANCE;
-    private static final UserService USER_SERVICE = UserService.INSTANCE;
+    private QuestService questService;
+    private UserService userService;
+
+    @Override
+    public void init() throws ServletException {
+        questService = QuestService.INSTANCE;
+        userService = UserService.INSTANCE;
+        super.init();
+    }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         JSP.forward(request, response, "new_quest");
@@ -26,7 +34,7 @@ public class NewQuestServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String login = ((UserDto) request.getSession().getAttribute("user")).getLogin();
-        Optional<User> byLogin = USER_SERVICE.getByLogin(login);
+        Optional<User> byLogin = userService.getByLogin(login);
         QuestDto questDto = QuestDto.builder()
                 .userId(byLogin.get().getId())
                 .text(request.getParameter("text"))

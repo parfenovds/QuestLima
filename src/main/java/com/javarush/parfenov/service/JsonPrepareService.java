@@ -17,8 +17,8 @@ import java.util.Optional;
 
 public enum JsonPrepareService {
     INSTANCE;
-    private static final NodeRepository NODE_REPOSITORY = NodeRepository.INSTANCE;
-    private static final ParentToChildRepository PARENT_TO_CHILD_REPOSITORY = ParentToChildRepository.INSTANCE;
+    private final NodeRepository NODE_REPOSITORY = NodeRepository.INSTANCE;
+    private final ParentToChildRepository PARENT_TO_CHILD_REPOSITORY = ParentToChildRepository.INSTANCE;
 
     @SneakyThrows
     public String getJson(Long questId) {
@@ -34,7 +34,7 @@ public enum JsonPrepareService {
         return getJson(quest.getId());
     }
 
-    private static ObjectNode recursiveTreeConstructor(JsonNodeFactory factory, Long questId, Node sourceNode) {
+    private ObjectNode recursiveTreeConstructor(JsonNodeFactory factory, Long questId, Node sourceNode) {
         ObjectNode targetJNode = factory.objectNode();
         Long nodeId = sourceNode.getNodeId();
         targetJNode
@@ -50,7 +50,7 @@ public enum JsonPrepareService {
         return targetJNode;
     }
 
-    private static void addAdditionalLinks(JsonNodeFactory factory, Long questId, ObjectNode targetJNode, Long nodeId) {
+    private void addAdditionalLinks(JsonNodeFactory factory, Long questId, ObjectNode targetJNode, Long nodeId) {
         ArrayNode additionalLinkedNodes = factory.arrayNode();
         Collection<ParentToChild> parentToChildren = PARENT_TO_CHILD_REPOSITORY.getApproptiate(questId, nodeId);
         if (!parentToChildren.isEmpty()) {
@@ -63,7 +63,7 @@ public enum JsonPrepareService {
         }
     }
 
-    private static void addChildrenNodes(JsonNodeFactory factory, Long questId, ObjectNode targetJNode, Long nodeId) {
+    private void addChildrenNodes(JsonNodeFactory factory, Long questId, ObjectNode targetJNode, Long nodeId) {
         ArrayNode children = factory.arrayNode();
         Collection<Node> childNodes = NODE_REPOSITORY.getByParentId(nodeId, questId);
         if (!childNodes.isEmpty()) {

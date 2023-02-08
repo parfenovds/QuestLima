@@ -2,25 +2,28 @@ package com.javarush.parfenov.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javarush.parfenov.repository.NodeRepository;
-import com.javarush.parfenov.repository.ParentToChildRepository;
 import com.javarush.parfenov.service.JsonPrepareService;
 import com.javarush.parfenov.util.JsonStringExtractor;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
 @WebServlet(name = "SendJsonServlet", value = "/returnJson")
 public class SendJsonServlet extends HttpServlet {
 
-    private final JsonPrepareService jsonPrepareService = JsonPrepareService.INSTANCE;
+    private JsonPrepareService jsonPrepareService;
 
     //    private final NodeRepository nodeRepository = NodeRepository.INSTANCE;
 //    private final ParentToChildRepository parentToChildRepository = ParentToChildRepository.INSTANCE;
+
+    @Override
+    public void init() throws ServletException {
+        jsonPrepareService = JsonPrepareService.INSTANCE;
+        super.init();
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

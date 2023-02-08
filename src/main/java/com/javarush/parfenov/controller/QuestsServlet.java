@@ -11,13 +11,19 @@ import java.io.IOException;
 
 @WebServlet(name = "QuestsServlet", value = "/quests")
 public class QuestsServlet extends HttpServlet {
-    private static final QuestService QUEST_SERVICE = QuestService.INSTANCE;
+    private QuestService questService;
+
+    @Override
+    public void init() throws ServletException {
+        questService = QuestService.INSTANCE;
+        super.init();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession();
         UserDto userDto = (UserDto) session.getAttribute("user");
-        session.setAttribute("quests", QUEST_SERVICE.getQuestDtoByUserLogin(userDto.getLogin()));
+        session.setAttribute("quests", questService.getQuestDtoByUserLogin(userDto.getLogin()));
         JSP.forwardToPathIfLoggedIn(request, response, userDto, "quests");
     }
 }

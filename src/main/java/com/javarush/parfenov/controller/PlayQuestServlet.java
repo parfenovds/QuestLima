@@ -14,15 +14,22 @@ import java.util.Collection;
 
 @WebServlet(name = "PlayQuestServlet", value = "/playQuest")
 public class PlayQuestServlet extends HttpServlet {
-    private static final QuestService QUEST_SERVICE = QuestService.INSTANCE;
-    private static final NodeService NODE_SERVICE = NodeService.INSTANCE;
+    private QuestService questService = QuestService.INSTANCE;
+    private NodeService nodeService;
+
+    @Override
+    public void init() throws ServletException {
+        questService = QuestService.INSTANCE;
+        nodeService = NodeService.INSTANCE;
+        super.init();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Long questId = Long.parseLong(request.getParameter("id")); //TODO: check if exists
         HttpSession session = request.getSession();
-        Node node = NODE_SERVICE.getByType(NodeType.INIT, questId).get();
-        Collection<Node> answers = NODE_SERVICE.getByParentId(node.getNodeId(), questId);
+        Node node = nodeService.getByType(NodeType.INIT, questId).get();
+        Collection<Node> answers = nodeService.getByParentId(node.getNodeId(), questId);
         session.setAttribute("currentQuestion", node);
         session.setAttribute("currentAnswers", answers);
         JSP.forward(request, response, "play_quest");

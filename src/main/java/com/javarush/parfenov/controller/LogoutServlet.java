@@ -12,6 +12,6 @@ public class LogoutServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getSession().setAttribute("user", null);
-        JSP.forward(request, response, "index");
+        response.sendRedirect("login");
     }
 }
