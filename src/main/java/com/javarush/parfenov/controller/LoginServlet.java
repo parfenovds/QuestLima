@@ -3,7 +3,6 @@ package com.javarush.parfenov.controller;
 import com.javarush.parfenov.dto.CreateUserDto;
 import com.javarush.parfenov.dto.UserDto;
 import com.javarush.parfenov.entity.Role;
-import com.javarush.parfenov.entity.User;
 import com.javarush.parfenov.exception.ValidationException;
 import com.javarush.parfenov.service.QuestService;
 import com.javarush.parfenov.service.UserService;
