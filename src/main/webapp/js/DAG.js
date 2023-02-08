@@ -79,7 +79,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
 
     d3.select("#rightDiv")
         .append("button")
-        .html("Get JSON")
+        .html("Get JSON to console")
         .attr("class", "rightButton")
         .on("click", getJson);
 
@@ -127,7 +127,7 @@ treeJSON = d3.json(addr, function (error, treeData) {
 
     d3.select("#rightDiv")
         .append("button")
-        .html("Send JSON")
+        .html("Save Quest")
         .attr("class", "rightButton")
         .on("click", sendJson);
 
