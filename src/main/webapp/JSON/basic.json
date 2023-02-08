@@ -1,0 +1,8 @@
+{
+  "node_id": "1",
+  "name": "Click on me",
+  "text": "This is a starting node. You can click on it and then click 'addNode' button to make a child node. Black (as starting non-removable node) and yellow nodes are questions, blue are answers, red and green - fail and win, respectively. Text in this block is the text of the node, text in block above is a short node name (for this editor only, not applicable to the game itself).",
+  "type": "init",
+  "node_parent": "0",
+  "lonely_child": 0
+}
