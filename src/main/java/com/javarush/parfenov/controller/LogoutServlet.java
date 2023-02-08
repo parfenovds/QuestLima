@@ -1,6 +1,5 @@
 package com.javarush.parfenov.controller;
 
-import com.javarush.parfenov.util.JSP;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import jakarta.servlet.annotation.*;

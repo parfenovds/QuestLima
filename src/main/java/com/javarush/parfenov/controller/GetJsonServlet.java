@@ -1,7 +1,6 @@
 package com.javarush.parfenov.controller;
 
 import com.javarush.parfenov.service.QuestObjectsService;
-import com.javarush.parfenov.service.QuestService;
 import com.javarush.parfenov.util.JSP;
 import com.javarush.parfenov.util.JsonStringExtractor;
 import jakarta.servlet.*;
@@ -19,7 +18,7 @@ public class GetJsonServlet extends HttpServlet {
         super.init();
     }
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         String jsonString = JsonStringExtractor.getJsonParameter(request);
         questObjectsService.jsonParse(jsonString);
         JSP.forward(request, response, "quests");

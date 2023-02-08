@@ -16,9 +16,6 @@ public class SendJsonServlet extends HttpServlet {
 
     private JsonPrepareService jsonPrepareService;
 
-    //    private final NodeRepository nodeRepository = NodeRepository.INSTANCE;
-//    private final ParentToChildRepository parentToChildRepository = ParentToChildRepository.INSTANCE;
-
     @Override
     public void init() throws ServletException {
         jsonPrepareService = JsonPrepareService.INSTANCE;
@@ -26,7 +23,7 @@ public class SendJsonServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String jsonString = JsonStringExtractor.getJsonParameter(request);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root = mapper.readTree(jsonString);

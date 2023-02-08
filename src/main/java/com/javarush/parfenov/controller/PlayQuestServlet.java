@@ -14,12 +14,10 @@ import java.util.Collection;
 
 @WebServlet(name = "PlayQuestServlet", value = "/playQuest")
 public class PlayQuestServlet extends HttpServlet {
-    private QuestService questService = QuestService.INSTANCE;
     private NodeService nodeService;
 
     @Override
     public void init() throws ServletException {
-        questService = QuestService.INSTANCE;
         nodeService = NodeService.INSTANCE;
         super.init();
     }

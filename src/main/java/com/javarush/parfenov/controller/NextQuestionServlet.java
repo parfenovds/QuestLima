@@ -1,9 +1,11 @@
 package com.javarush.parfenov.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javarush.parfenov.entity.Node;
 import com.javarush.parfenov.entity.ParentToChild;
+import com.javarush.parfenov.service.NextDialogService;
 import com.javarush.parfenov.service.NodeService;
 import com.javarush.parfenov.service.ParentToChildService;
 import com.javarush.parfenov.util.JSP;
@@ -19,11 +21,13 @@ import java.util.List;
 public class NextQuestionServlet extends HttpServlet {
     private NodeService nodeService;
     private ParentToChildService parentToChildService;
+    private NextDialogService nextDialogService;
 
     @Override
     public void init() throws ServletException {
         nodeService = NodeService.INSTANCE;
         parentToChildService = ParentToChildService.INSTANCE;
+        nextDialogService = NextDialogService.INSTANCE;
         super.init();
     }
 
@@ -33,30 +37,16 @@ public class NextQuestionServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String jsonString = JsonStringExtractor.getJsonParameter(request);
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode root = mapper.readTree(jsonString);
-        long questId = root.get("questId").asLong();
-        long answerNodeId = root.get("nodeId").asLong();
-        Node answerNode = nodeService.get(answerNodeId, questId).get();
-        Long nodeId;
-        if (answerNode.getNextLonelyId() != 0L) {
-            nodeId = answerNode.getNextLonelyId();
-        } else {
-            List<ParentToChild> appropriate = parentToChildService.getAppropriate(questId, answerNodeId);
-            nodeId = appropriate.get(0).getChildNodeId();
-        }
+        Node answerNode = nextDialogService.getAnswerNode(jsonString);
+        long questId = answerNode.getQuestId();
+        long answerNodeId = answerNode.getNodeId();
+        Long nextQuestionId = nextDialogService.getNextQuestionId(answerNode, questId, answerNodeId);
+        Node nextQuestion = nodeService.get(nextQuestionId, questId).get();
+        List<Node> answers = nextDialogService.getAnswers(questId, nextQuestionId, nextQuestion);
         HttpSession session = request.getSession();
-        Node node = nodeService.get(nodeId, questId).get();
-        List<Node> answers = nodeService.getByParentId(node.getNodeId(), questId);
-        List<ParentToChild> appropriate = parentToChildService.getAppropriate(questId, nodeId);
-        for (ParentToChild parentToChild : appropriate) {
-            Long childNodeId = parentToChild.getChildNodeId();
-            Node node1 = nodeService.get(childNodeId, questId).get();
-            answers.add(node1);
-        }
-        session.setAttribute("currentQuestion", node);
+        session.setAttribute("currentQuestion", nextQuestion);
         session.setAttribute("currentAnswers", answers);
         JSP.forward(request, response, "play_quest");
     }

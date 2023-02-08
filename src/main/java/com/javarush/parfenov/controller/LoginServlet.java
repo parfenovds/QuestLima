@@ -2,8 +2,6 @@ package com.javarush.parfenov.controller;
 
 import com.javarush.parfenov.dto.CreateUserDto;
 import com.javarush.parfenov.dto.UserDto;
-import com.javarush.parfenov.entity.Role;
-import com.javarush.parfenov.exception.ValidationException;
 import com.javarush.parfenov.service.QuestService;
 import com.javarush.parfenov.service.UserService;
 import com.javarush.parfenov.util.JSP;
@@ -33,7 +31,7 @@ public class LoginServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         CreateUserDto createUserDto = CreateUserDto.builder()
                 .login(request.getParameter("login"))
                 .password(request.getParameter("password"))

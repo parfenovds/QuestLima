@@ -32,7 +32,7 @@ public class NewQuestServlet extends HttpServlet {
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         String login = ((UserDto) request.getSession().getAttribute("user")).getLogin();
         Optional<User> byLogin = userService.getByLogin(login);
         QuestDto questDto = QuestDto.builder()
