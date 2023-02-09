@@ -50,12 +50,12 @@ public enum QuestObjectsService {
         JsonNode next = iterator.next();
         if (next.isArray()) {
             for (JsonNode node : next) {
-                extracted(node);
+                middleConverter(node);
             }
         }
     }
 
-    private void extracted(JsonNode node) {
+    private void middleConverter(JsonNode node) {
         addAdditionalLinks(node);
         putNode(node);
         if (node.has("children")) {
@@ -87,7 +87,7 @@ public enum QuestObjectsService {
 
     private void lowerConverter(JsonNode node) {
         for (JsonNode children : node.get("children")) {
-            extracted(children);
+            middleConverter(children);
         }
     }
 }
